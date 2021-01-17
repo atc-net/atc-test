@@ -46,7 +46,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: .NET Test
-        run: dotnet test --no-restore --verbosity normal --collect "Code coverage"
+        run: dotnet test --no-build --verbosity normal --collect "Code coverage"
 
   publish-internal:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
