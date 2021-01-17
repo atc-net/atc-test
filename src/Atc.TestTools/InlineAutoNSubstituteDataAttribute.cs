@@ -21,8 +21,9 @@ namespace Atc.TestTools
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineAutoNSubstituteDataAttribute"/> class.
         /// </summary>
-        public InlineAutoNSubstituteDataAttribute([NotNull] params object[] values)
-            : base(new InlineDataAttribute(values), new AutoNSubstituteDataAttribute())
+        /// <param name="data">The data values to pass to the theory.</param>
+        public InlineAutoNSubstituteDataAttribute([NotNull] params object[] data)
+            : base(new InlineDataAttribute(data), new AutoNSubstituteDataAttribute())
         {
         }
     }
