@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using AutoFixture.Xunit2;
 using Xunit;
 
-namespace Atc.TestTools
+namespace Atc.Test
 {
     /// <summary>
     /// Provides a data source for a data theory, with the data coming from

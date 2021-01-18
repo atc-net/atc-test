@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using AutoFixture.Kernel;
 
-namespace Atc.TestTools.Customizations.Generators
+namespace Atc.Test.Customizations.Generators
 {
     /// <summary>
     /// Extensions for <see cref="ISpecimenBuilder"/> requests.

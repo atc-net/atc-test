@@ -1,8 +1,8 @@
-using Atc.TestTools.Customizations;
+using Atc.Test.Customizations;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 
-namespace Atc.TestTools
+namespace Atc.Test
 {
     /// <summary>
     /// Factory for creating <see cref="IFixture"/>s with default customizations.

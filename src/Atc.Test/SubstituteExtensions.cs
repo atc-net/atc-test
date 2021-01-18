@@ -6,7 +6,7 @@ using NSubstitute;
 using NSubstitute.Core;
 using NSubstitute.ReceivedExtensions;
 
-namespace Atc.TestTools
+namespace Atc.Test
 {
     /// <summary>
     /// Extensions for test substitutes created by NSubstitute.

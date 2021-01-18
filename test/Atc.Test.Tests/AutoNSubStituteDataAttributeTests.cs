@@ -2,7 +2,7 @@ using FluentAssertions;
 using NSubstitute;
 using Xunit;
 
-namespace Atc.TestTools.Tests
+namespace Atc.Test.Tests
 {
     public class AutoNSubStituteDataAttributeTests
     {

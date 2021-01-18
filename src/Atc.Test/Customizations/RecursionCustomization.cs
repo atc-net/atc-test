@@ -1,6 +1,6 @@
 using AutoFixture;
 
-namespace Atc.TestTools.Customizations
+namespace Atc.Test.Customizations
 {
     /// <summary>
     /// Responsible for setting up recursion behavior

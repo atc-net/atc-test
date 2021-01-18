@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Atc.TestTools\Atc.TestTools.csproj" />
+    <ProjectReference Include="..\..\src\Atc.Test\Atc.Test.csproj" />
   </ItemGroup>
 
 </Project>

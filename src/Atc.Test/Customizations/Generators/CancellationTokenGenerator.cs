@@ -1,7 +1,7 @@
 using System.Threading;
 using AutoFixture.Kernel;
 
-namespace Atc.TestTools.Customizations.Generators
+namespace Atc.Test.Customizations.Generators
 {
     /// <summary>
     /// Responsible for generating <see cref="CancellationToken"/> instances

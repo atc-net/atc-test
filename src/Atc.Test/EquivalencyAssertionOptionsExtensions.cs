@@ -2,7 +2,7 @@ using System;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
 
-namespace Atc.TestTools
+namespace Atc.Test
 {
     /// <summary>
     /// Extensions for the <see cref="EquivalencyAssertionOptions{T}"/> type.

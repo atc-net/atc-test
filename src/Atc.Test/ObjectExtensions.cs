@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
-namespace Atc.TestTools
+namespace Atc.Test
 {
     /// <summary>
     /// Extensions for <see cref="object"/> used in tests.

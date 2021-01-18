@@ -1,4 +1,4 @@
-# ATC TestTools
+# ATC Test
 
 Common tools for writing tests using XUnit, AutoFixture, NSubstitute and FluentAssertions.
 

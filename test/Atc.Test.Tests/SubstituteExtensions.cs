@@ -1,4 +1,4 @@
-namespace Atc.TestTools.Tests
+namespace Atc.Test.Tests
 {
     public static class SubstituteExtensions
     {

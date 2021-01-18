@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Atc.TestTools
+namespace Atc.Test
 {
     /// <summary>
     /// Extensions for the <see cref="Task"/> type.

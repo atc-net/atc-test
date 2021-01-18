@@ -1,8 +1,8 @@
-using Atc.TestTools.Customizations.Generators;
+using Atc.Test.Customizations.Generators;
 using AutoFixture;
 using AutoFixture.Kernel;
 
-namespace Atc.TestTools.Customizations
+namespace Atc.Test.Customizations
 {
     /// <summary>
     /// Responsible for registering custom <see cref="ISpecimenBuilder"/>s.
