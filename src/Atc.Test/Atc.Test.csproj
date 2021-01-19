@@ -1,10 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IsTestProject>false</IsTestProject>
     <AssemblyVersion>1.0.0</AssemblyVersion>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Atc.Test</PackageId>
     <Title>Atc.Test</Title>
     <Authors>atc-net</Authors>
     <Description>Common tools for writing tests using XUnit, AutoFixture, NSubstitute and FluentAssertions.</Description>
@@ -14,22 +18,9 @@
     <RepositoryUrl>https://github.com/atc-net/atc-test</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <PackageId>Atc.Test</PackageId>
-    <AssemblyName>Atc.Test</AssemblyName>
-    <DebugType>embedded</DebugType>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IsPackable>true</IsPackable>
-    <PackAsTool>false</PackAsTool>
-    <TieredCompilation>true</TieredCompilation>
     <IncludeSymbols>true</IncludeSymbols>
-    <DebugType>embedded</DebugType>
-    <Deterministic>true</Deterministic>
-	<IsTestProject>false</IsTestProject>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Nullable>enable</Nullable>
-    <LangVersion>9.0</LangVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
