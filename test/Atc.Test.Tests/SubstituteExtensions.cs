@@ -4,6 +4,10 @@ namespace Atc.Test.Tests
     {
         public static bool IsSubstitute(
             this object substitute)
-            => substitute.GetType().Namespace == "Castle.Proxies";
+            => substitute?
+                .GetType()
+                .Namespace?
+                .Equals("Castle.Proxies", System.StringComparison.Ordinal)
+            ?? false;
     }
 }

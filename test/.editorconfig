@@ -46,3 +46,6 @@ dotnet_diagnostic.SA1133.severity = none            # https://github.com/atc-net
 ##########################################
 # Custom - Code Analyzers Rules
 ##########################################
+dotnet_diagnostic.CA1034.severity = none            # Nested types
+dotnet_diagnostic.SA1201.severity = none            # Nested types before other class members
+dotnet_diagnostic.MA0006.severity = none            # Test projects needs to be able to compare stirngs with "=="

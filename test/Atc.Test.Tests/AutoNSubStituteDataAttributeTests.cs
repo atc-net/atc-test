@@ -6,15 +6,17 @@ namespace Atc.Test.Tests
 {
     public class AutoNSubStituteDataAttributeTests
     {
-        public class ConcreteType
+        public interface IInterfaceType
         {
-            public string StringProperty { get; set; }
+            public string? StringProperty { get; set; }
+
             public int IntProperty { get; set; }
         }
 
-        public interface IInterfaceType
+        public class ConcreteType
         {
-            public string StringProperty { get; set; }
+            public string? StringProperty { get; set; }
+
             public int IntProperty { get; set; }
         }
 
