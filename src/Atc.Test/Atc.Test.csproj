@@ -12,7 +12,7 @@
     <Title>Atc.Test</Title>
     <Authors>atc-net</Authors>
     <Description>Common tools for writing tests using XUnit, AutoFixture, NSubstitute and FluentAssertions.</Description>
-    <PackageProjectUrl>https://github.com/atc-net/atc-test/</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/atc-net/atc-test/tree/main/src/Atc.Test</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/atc-net/atc/master/images/icon.png</PackageIconUrl>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/atc-net/atc-test</RepositoryUrl>
