@@ -17,7 +17,7 @@ namespace Atc.Test
         public static IFixture Create()
             => new Fixture()
                 .Customize(new RecursionCustomization())
-                .Customize(new CustomGeneratorsCustomization())
+                .Customize(new AutoRegisterCustomization())
                 .Customize(new AutoNSubstituteCustomization
                 {
                     ConfigureMembers = false,

@@ -1,3 +1,4 @@
+using System.Threading;
 using FluentAssertions;
 using NSubstitute;
 using Xunit;
@@ -56,6 +57,14 @@ namespace Atc.Test.Tests
                 .Returns(i);
             abstractType.IntProperty
                 .Should().Be(i);
+        }
+
+        [Theory, AutoNSubstituteData]
+        public void Should_Create_Uncancelled_CancellationToken(
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.IsCancellationRequested
+                .Should().BeFalse();
         }
     }
 }

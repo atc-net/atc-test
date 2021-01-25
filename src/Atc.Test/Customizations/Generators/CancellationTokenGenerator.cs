@@ -7,6 +7,7 @@ namespace Atc.Test.Customizations.Generators
     /// Responsible for generating <see cref="CancellationToken"/> instances
     /// that has not been canceled.
     /// </summary>
+    [AutoRegister]
     public class CancellationTokenGenerator : ISpecimenBuilder
     {
         /// <inheritdoc/>
