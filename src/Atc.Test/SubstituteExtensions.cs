@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -11,6 +12,10 @@ namespace Atc.Test
     /// <summary>
     /// Extensions for test substitutes created by NSubstitute.
     /// </summary>
+    [SuppressMessage(
+        "AsyncUsage",
+        "AsyncFixer03:Fire-and-forget async-void methods or delegates",
+        Justification = "Calls on substitutes are made for validation, await is not required.")]
     public static class SubstituteExtensions
     {
         /// <summary>
