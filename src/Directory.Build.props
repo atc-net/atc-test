@@ -34,7 +34,7 @@
 
   <PropertyGroup Label="Build instructions">
     <OutputType>Library</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
 
     <!-- creates a regular package and a symbols package -->
     <IncludeSymbols>true</IncludeSymbols>
