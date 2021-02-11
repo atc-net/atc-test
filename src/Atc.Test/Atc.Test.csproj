@@ -6,6 +6,12 @@
     <Description>Common tools for writing tests using XUnit, AutoFixture, NSubstitute and FluentAssertions.</Description>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Ensure projects in src folder are not labeled as test project (regardless of project name) -->
+    <IsTestProject>false</IsTestProject>
+    <SonarQubeTestProject>false</SonarQubeTestProject>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.15.0" />
     <PackageReference Include="AutoFixture.Xunit2" Version="4.15.0" />
