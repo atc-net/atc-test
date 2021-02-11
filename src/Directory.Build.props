@@ -52,10 +52,6 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <!-- Web projects aren't packable by default. To override the default behavior, add the following -->
     <!--<IsPackable>true</IsPackable>-->
-
-    <!-- Ensure projects in src folder are not labeled as test project (regardless of project name) -->
-    <IsTestProject>false</IsTestProject>
-    <SonarQubeTestProject>false</SonarQubeTestProject>
   </PropertyGroup>
 
   <!--
