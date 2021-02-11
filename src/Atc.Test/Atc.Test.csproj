@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PackageId>Atc.Test</PackageId>
     <PackageTags>xunit;NSubstitute;AutoFixture;FluentAssertions</PackageTags>
     <Description>Common tools for writing tests using XUnit, AutoFixture, NSubstitute and FluentAssertions.</Description>
