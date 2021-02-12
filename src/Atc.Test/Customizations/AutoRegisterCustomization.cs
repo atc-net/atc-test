@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using AutoFixture;
 using AutoFixture.Kernel;
 
@@ -20,7 +22,7 @@ namespace Atc.Test.Customizations
 
             var autoRegisterTypes = AppDomain.CurrentDomain
                 .GetAssemblies()
-                .SelectMany(a => a.GetTypes())
+                .SelectMany(GetLoadableTypes)
                 .Where(HasAutoRegisterAttribute)
                 .ToArray();
 
@@ -50,5 +52,18 @@ namespace Atc.Test.Customizations
             => type.GetCustomAttributes(
                 typeof(AutoRegisterAttribute),
                 inherit: false).Length > 0;
+
+        private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types?.OfType<Type>()
+                    ?? Enumerable.Empty<Type>();
+            }
+        }
     }
 }
