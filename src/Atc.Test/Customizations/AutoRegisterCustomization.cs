@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using AutoFixture;
 using AutoFixture.Kernel;
 
@@ -10,6 +12,8 @@ namespace Atc.Test.Customizations
     /// </summary>
     public class AutoRegisterCustomization : ICustomization
     {
+        private static Type[]? autoRegisterTypes;
+
         /// <inheritdoc/>
         public void Customize(IFixture fixture)
         {
@@ -18,11 +22,14 @@ namespace Atc.Test.Customizations
                 throw new ArgumentNullException(nameof(fixture));
             }
 
-            var autoRegisterTypes = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(HasAutoRegisterAttribute)
-                .ToArray();
+            if (autoRegisterTypes is null)
+            {
+                autoRegisterTypes = AppDomain.CurrentDomain
+                    .GetAssemblies()
+                    .SelectMany(GetLoadableTypes)
+                    .Where(HasAutoRegisterAttribute)
+                    .ToArray();
+            }
 
             foreach (var type in autoRegisterTypes)
             {
@@ -50,5 +57,18 @@ namespace Atc.Test.Customizations
             => type.GetCustomAttributes(
                 typeof(AutoRegisterAttribute),
                 inherit: false).Length > 0;
+
+        private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types?.OfType<Type>()
+                    ?? Enumerable.Empty<Type>();
+            }
+        }
     }
 }
