@@ -12,6 +12,8 @@ namespace Atc.Test.Customizations
     /// </summary>
     public class AutoRegisterCustomization : ICustomization
     {
+        private static Type[]? autoRegisterTypes;
+
         /// <inheritdoc/>
         public void Customize(IFixture fixture)
         {
@@ -20,11 +22,14 @@ namespace Atc.Test.Customizations
                 throw new ArgumentNullException(nameof(fixture));
             }
 
-            var autoRegisterTypes = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(GetLoadableTypes)
-                .Where(HasAutoRegisterAttribute)
-                .ToArray();
+            if (autoRegisterTypes is null)
+            {
+                autoRegisterTypes = AppDomain.CurrentDomain
+                    .GetAssemblies()
+                    .SelectMany(GetLoadableTypes)
+                    .Where(HasAutoRegisterAttribute)
+                    .ToArray();
+            }
 
             foreach (var type in autoRegisterTypes)
             {
