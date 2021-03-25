@@ -39,7 +39,7 @@ namespace Atc.Test
         /// <returns>The return value of the call.</returns>
         [return: MaybeNull]
         public static T InvokeProtectedMethod<T>(this object obj, string methodName, params object[] args)
-            => (T)InvokeProtectedMethod(obj, methodName, args);
+            => (T?)InvokeProtectedMethod(obj, methodName, args);
 
         /// <summary>
         /// Checks if an object has any properties.
