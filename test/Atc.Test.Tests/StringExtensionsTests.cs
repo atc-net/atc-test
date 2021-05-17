@@ -25,11 +25,11 @@ namespace Atc.Test.Tests
         [InlineData("Line \n Break", "Line Break")]
         [InlineData(" \n  Leading spaces", "Leading spaces")]
         [InlineData("Trailing spaces  \n ", "Trailing spaces")]
-        public void BeSameContentAs_Should_Compare_String_WithoutFormatting(
+        public void BeSimilarContentAs_Should_Compare_String_WithoutFormatting(
             string input,
             string expectedResult)
             => input
                 .Should()
-                .BeSameContentAs(expectedResult);
+                .BeSimilarContentAs(expectedResult);
     }
 }

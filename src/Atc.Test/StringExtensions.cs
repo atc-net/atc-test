@@ -7,7 +7,7 @@ namespace Atc.Test
 {
     public static class StringExtensions
     {
-        public static void BeSameContentAs(
+        public static void BeSimilarContentAs(
             this StringAssertions assertions,
             string expected,
             string because = "",
@@ -16,7 +16,7 @@ namespace Atc.Test
                 .Should()
                 .BeEquivalentTo(expected.WithoutFormatting(), because, becauseArgs);
 
-        public static void NotBeSameContentAs(
+        public static void NotBeSimilarContentAs(
             this StringAssertions assertions,
             string expected,
             string because = "",
