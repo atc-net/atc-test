@@ -15,7 +15,8 @@ namespace Atc.Test
         /// </summary>
         /// <returns>Configured <see cref="IFixture"/> instance.</returns>
         public static IFixture Create()
-            => new Fixture()
+        {
+            var fixture = new Fixture()
                 .Customize(new RecursionCustomization())
                 .Customize(new AutoRegisterCustomization())
                 .Customize(new AutoNSubstituteCustomization
@@ -23,5 +24,10 @@ namespace Atc.Test
                     ConfigureMembers = false,
                     GenerateDelegates = true,
                 });
+
+            fixture.Customizations.Add(new RegularExpressionGenerator());
+
+            return fixture;
+        }
     }
 }
