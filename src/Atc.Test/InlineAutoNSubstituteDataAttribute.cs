@@ -13,9 +13,9 @@ namespace Atc.Test
     /// NSubstitute is used when the type is abstract, or when the <see cref="SubstituteAttribute"/> is applied.
     /// </remarks>
     [SuppressMessage(
-            "Design",
-            "CA1019:Define accessors for attribute arguments",
-            Justification = "By design")]
+        "Design",
+        "CA1019:Define accessors for attribute arguments",
+        Justification = "By design")]
     public sealed class InlineAutoNSubstituteDataAttribute : CompositeDataAttribute
     {
         /// <summary>
