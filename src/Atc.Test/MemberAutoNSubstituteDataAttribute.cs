@@ -1,6 +1,13 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Reflection;
+using AutoFixture;
+using AutoFixture.Kernel;
 using AutoFixture.Xunit2;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Atc.Test
 {
@@ -16,22 +23,52 @@ namespace Atc.Test
     /// The member must return something compatible with
     /// IEnumerable&lt;object[]&gt; with the test data.
     /// </summary>
-    [SuppressMessage(
-        "Design",
-        "CA1019:Define accessors for attribute arguments",
-        Justification = "By design")]
-    public sealed class MemberAutoNSubstituteDataAttribute : CompositeDataAttribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [DataDiscoverer("Xunit.Sdk.MemberDataDiscoverer", "xunit.core")]
+    public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemberAutoNSubstituteDataAttribute"/> class.
-        /// </summary>
-        /// <param name="memberName">The name of the public static member on the test
-        /// class that will provide the test data.</param>
-        public MemberAutoNSubstituteDataAttribute(string memberName)
-            : base(
-                new MemberDataAttribute(memberName),
-                new AutoNSubstituteDataAttribute())
+        public MemberAutoNSubstituteDataAttribute(string memberName, params object[] parameters)
+            : base(memberName, parameters)
         {
+        }
+
+        protected override object[] ConvertDataItem(MethodInfo testMethod, object item)
+        {
+            if (item is not object[] values)
+            {
+                throw new ArgumentException(
+                    $"Property {MemberName} on {MemberType.Name} " +
+                    $"yielded an item that is not an object[]");
+            }
+
+            var fixture = FixtureFactory.Create();
+
+            return values
+                .Union(testMethod
+                    .GetParameters()
+                    .Skip(values.Length)
+                    .Select(p => GetSpecimen(fixture, p)))
+                .ToArray();
+        }
+
+        private static object GetSpecimen(
+            IFixture fixture,
+            ParameterInfo parameter)
+        {
+            var attributes = parameter
+                .GetCustomAttributes()
+                .OfType<IParameterCustomizationSource>()
+                .OrderBy(x => x is FrozenAttribute);
+
+            foreach (var attribute in attributes)
+            {
+                attribute
+                    .GetCustomization(parameter)
+                    .Customize(fixture);
+            }
+
+            return new SpecimenContext(fixture)
+                .Resolve(parameter);
         }
     }
 }

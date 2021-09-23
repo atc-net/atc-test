@@ -7,23 +7,9 @@ namespace Atc.Test.Tests
 {
     public class AutoNSubStituteDataAttributeTests
     {
-        public interface IInterfaceType
-        {
-            public string? StringProperty { get; set; }
-
-            public int IntProperty { get; set; }
-        }
-
-        public class ConcreteType
-        {
-            public string? StringProperty { get; set; }
-
-            public int IntProperty { get; set; }
-        }
-
         [Theory, AutoNSubstituteData]
         public void Should_Create_Concrete_Type_With_AutoFixture(
-            ConcreteType concreteType)
+            SampleClass concreteType)
         {
             concreteType
                 .Should().NotBeNull();
@@ -39,7 +25,7 @@ namespace Atc.Test.Tests
 
         [Theory, AutoNSubstituteData]
         public void Should_Create_Abstract_Type_With_NSubstitute(
-            IInterfaceType abstractType,
+            ISampleInterface abstractType,
             string str,
             int i)
         {
