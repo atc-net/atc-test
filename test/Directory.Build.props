@@ -10,8 +10,16 @@
     <Nullable>annotations</Nullable>
   </PropertyGroup>
 
-  <ItemGroup Label="Test Analyzers">
-    <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.14" PrivateAssets="All" />
+  <ItemGroup>
+    <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.15" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="AutoFixture" />
+    <Using Include="AutoFixture.Xunit2" />
+    <Using Include="FluentAssertions" />
+    <Using Include="NSubstitute" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>
