@@ -1,9 +1,9 @@
-﻿namespace Atc.Test.Tests
-{
-    public class SampleClass
-    {
-        public string? StringProperty { get; set; }
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+namespace Atc.Test.Tests.SampleTypes;
 
-        public int IntProperty { get; set; }
-    }
+public class SampleClass
+{
+    public string? StringProperty { get; set; }
+
+    public int IntProperty { get; set; }
 }

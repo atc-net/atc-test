@@ -1,74 +1,66 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using AutoFixture;
-using AutoFixture.Kernel;
+namespace Atc.Test.Customizations;
 
-namespace Atc.Test.Customizations
+/// <summary>
+/// Responsible for registering customizations with the <see cref="AutoRegisterAttribute"/> specified.
+/// </summary>
+public class AutoRegisterCustomization : ICustomization
 {
-    /// <summary>
-    /// Responsible for registering customizations with the <see cref="AutoRegisterAttribute"/> specified.
-    /// </summary>
-    public class AutoRegisterCustomization : ICustomization
+    private static Type[]? autoRegisterTypes;
+
+    /// <inheritdoc/>
+    public void Customize(IFixture fixture)
     {
-        private static Type[]? autoRegisterTypes;
-
-        /// <inheritdoc/>
-        public void Customize(IFixture fixture)
+        if (fixture is null)
         {
-            if (fixture is null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
-
-            if (autoRegisterTypes is null)
-            {
-                autoRegisterTypes = AppDomain.CurrentDomain
-                    .GetAssemblies()
-                    .SelectMany(GetLoadableTypes)
-                    .Where(HasAutoRegisterAttribute)
-                    .ToArray();
-            }
-
-            foreach (var type in autoRegisterTypes)
-            {
-                var customization = Activator.CreateInstance(type);
-                switch (customization)
-                {
-                    case ICustomization c:
-                        fixture.Customize(c);
-                        break;
-
-                    case ISpecimenBuilder b:
-                        fixture.Customizations.Add(b);
-                        break;
-
-                    default:
-                        throw new NotSupportedException(
-                            $"Invalid type {type.Name}. Only ICustomization and " +
-                            $"ISpecimenBuilder is supported for the " +
-                            $"AutoRegisterAttribute.");
-                }
-            }
+            throw new ArgumentNullException(nameof(fixture));
         }
 
-        private static bool HasAutoRegisterAttribute(Type type)
-            => type.GetCustomAttributes(
-                typeof(AutoRegisterAttribute),
-                inherit: false).Length > 0;
-
-        private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+        if (autoRegisterTypes is null)
         {
-            try
+            autoRegisterTypes = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(GetLoadableTypes)
+                .Where(HasAutoRegisterAttribute)
+                .ToArray();
+        }
+
+        foreach (var type in autoRegisterTypes)
+        {
+            var customization = Activator.CreateInstance(type);
+            switch (customization)
             {
-                return assembly.GetTypes();
+                case ICustomization c:
+                    fixture.Customize(c);
+                    break;
+
+                case ISpecimenBuilder b:
+                    fixture.Customizations.Add(b);
+                    break;
+
+                default:
+                    throw new NotSupportedException(
+                        $"Invalid type {type.Name}. Only ICustomization and " +
+                        $"ISpecimenBuilder is supported for the " +
+                        $"AutoRegisterAttribute.");
             }
-            catch (ReflectionTypeLoadException e)
-            {
-                return e.Types?.OfType<Type>()
-                    ?? Enumerable.Empty<Type>();
-            }
+        }
+    }
+
+    private static bool HasAutoRegisterAttribute(Type type)
+        => type.GetCustomAttributes(
+            typeof(AutoRegisterAttribute),
+            inherit: false).Length > 0;
+
+    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException e)
+        {
+            return e.Types?.OfType<Type>()
+                   ?? Enumerable.Empty<Type>();
         }
     }
 }

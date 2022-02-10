@@ -1,9 +1,8 @@
-﻿namespace Atc.Test.Tests
+namespace Atc.Test.Tests.SampleTypes;
+
+public enum SampleEnum
 {
-    public enum SampleEnum
-    {
-        One,
-        Two,
-        Three,
-    }
+    One,
+    Two,
+    Three,
 }
