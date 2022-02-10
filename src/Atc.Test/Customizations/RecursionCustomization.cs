@@ -1,21 +1,18 @@
-using AutoFixture;
+namespace Atc.Test.Customizations;
 
-namespace Atc.Test.Customizations
+/// <summary>
+/// Responsible for setting up recursion behavior
+/// to ensure AutoFixture will not throw on recursion.
+/// </summary>
+public class RecursionCustomization : ICustomization
 {
-    /// <summary>
-    /// Responsible for setting up recursion behavior
-    /// to ensure AutoFixture will not throw on recursion.
-    /// </summary>
-    public class RecursionCustomization : ICustomization
+    /// <inheritdoc/>
+    public void Customize(IFixture fixture)
     {
-        /// <inheritdoc/>
-        public void Customize(IFixture fixture)
-        {
-            fixture?.Behaviors
-                .Remove(new ThrowingRecursionBehavior());
+        fixture?.Behaviors
+            .Remove(new ThrowingRecursionBehavior());
 
-            fixture?.Behaviors
-                .Add(new OmitOnRecursionBehavior());
-        }
+        fixture?.Behaviors
+            .Add(new OmitOnRecursionBehavior());
     }
 }

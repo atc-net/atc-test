@@ -1,12 +1,11 @@
-namespace Atc.Test.Tests
-{
-    public class SampleDependantClass
-    {
-        public SampleDependantClass(ISampleInterface dependency)
-        {
-            Dependency = dependency;
-        }
+namespace Atc.Test.Tests.SampleTypes;
 
-        public ISampleInterface Dependency { get; }
+public class SampleDependantClass
+{
+    public SampleDependantClass(ISampleInterface dependency)
+    {
+        Dependency = dependency;
     }
+
+    public ISampleInterface Dependency { get; }
 }

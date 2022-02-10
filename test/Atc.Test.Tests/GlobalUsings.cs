@@ -1,0 +1,1 @@
+global using Atc.Test.Tests.SampleTypes;
