@@ -1,4 +1,4 @@
-[![NuGet Version](https://img.shields.io/nuget/v/atc-test.svg?logo=nuget&style=for-the-badge)](https://www.nuget.org/packages/atc.test)
+[![NuGet Version](https://img.shields.io/nuget/v/Atc.Test.svg?logo=nuget&style=for-the-badge)](https://www.nuget.org/packages/atc.test)
 
 # ATC Test
 
