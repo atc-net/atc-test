@@ -2,7 +2,7 @@ namespace Atc.Test.Tests;
 
 public class MemberAutoNSubstituteDataAttributeTests
 {
-    public static readonly IEnumerable<object[]> TestData = new[]
+    public static readonly IEnumerable<object[]> MemberData = new[]
     {
         new object[] { SampleEnum.One },
         new object[] { SampleEnum.Two },
@@ -10,8 +10,8 @@ public class MemberAutoNSubstituteDataAttributeTests
     };
 
     [Theory]
-    [MemberAutoNSubstituteData(nameof(TestData))]
-    public void MemberAutoNSubstituteData_Should_Call_For_Each_Value(
+    [MemberAutoNSubstituteData(nameof(MemberData))]
+    public void MemberAutoNSubstituteData_Should_Call_For_MemberData(
         SampleEnum value,
         [Frozen] ISampleInterface interfaceType,
         SampleClass concreteType,
@@ -26,23 +26,23 @@ public class MemberAutoNSubstituteDataAttributeTests
         dependantType.Dependency.Should().Be(interfaceType);
     }
 
-    public static readonly IEnumerable<object[]> TestDataMultiple = new[]
+    public static readonly IEnumerable<object[]> MemberDataMultipleValues = new[]
     {
         new object[] { SampleEnum.One, SampleEnum.Two },
         new object[] { SampleEnum.One, SampleEnum.One },
     };
 
     [Theory]
-    [MemberAutoNSubstituteData(nameof(TestDataMultiple))]
-    public void MemberAutoNSubstituteData_Should_Call_For_Each_Value_Mutliple(
-        SampleEnum value1,
-        SampleEnum value2,
+    [MemberAutoNSubstituteData(nameof(MemberDataMultipleValues))]
+    public void MemberAutoNSubstituteData_Should_Call_For_Each_MemderData_Values(
+        SampleEnum firstValue,
+        SampleEnum secondValue,
         [Frozen] ISampleInterface interfaceType,
         SampleClass concreteType,
         SampleDependantClass dependantType)
     {
-        value1.Should().BeOneOf(SampleEnum.One, SampleEnum.Two, SampleEnum.Three);
-        value2.Should().BeOneOf(SampleEnum.One, SampleEnum.Two, SampleEnum.Three);
+        firstValue.Should().BeOneOf(SampleEnum.One, SampleEnum.Two, SampleEnum.Three);
+        secondValue.Should().BeOneOf(SampleEnum.One, SampleEnum.Two, SampleEnum.Three);
         interfaceType.Should().NotBeNull();
         interfaceType.IsSubstitute().Should().BeTrue();
         concreteType.Should().NotBeNull();
