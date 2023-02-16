@@ -33,7 +33,7 @@ public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
         var fixture = FixtureFactory.Create();
 
         return values
-            .Union(testMethod
+            .Concat(testMethod
                 .GetParameters()
                 .Skip(values.Length)
                 .Select(p => GetSpecimen(fixture, p)))
