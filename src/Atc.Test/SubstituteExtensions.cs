@@ -8,6 +8,10 @@ namespace Atc.Test;
     "AsyncUsage",
     "AsyncFixer03:Fire-and-forget async-void methods or delegates",
     Justification = "Calls on substitutes are made for validation, await is not required.")]
+[SuppressMessage(
+    "AsyncUsage",
+    "MA0147:Avoid async void method for delegate",
+    Justification = "OK.")]
 public static class SubstituteExtensions
 {
     /// <summary>
