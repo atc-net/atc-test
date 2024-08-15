@@ -11,6 +11,7 @@ namespace Atc.Test;
     "Design",
     "CA1019:Define accessors for attribute arguments",
     Justification = "By design")]
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
 public sealed class InlineAutoNSubstituteDataAttribute : CompositeDataAttribute
 {
     /// <summary>
