@@ -7,6 +7,7 @@ namespace Atc.Test;
 /// <remarks>
 /// NSubstitute is used when the type is abstract, or when the <see cref="SubstituteAttribute"/> is applied.
 /// </remarks>
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public sealed class AutoNSubstituteDataAttribute : AutoDataAttribute
 {
     /// <summary>
