@@ -521,3 +521,4 @@ dotnet_diagnostic.CA1014.severity = none            # No need for CLSCompliantAt
 dotnet_diagnostic.SA1011.severity = none            # Space needed after closing square bracet "]" needed for nullable arrays
 
 dotnet_diagnostic.S1172.severity = none		        # False positive: Unused method parameters should be removed
+dotnet_diagnostic.CA1510.severity = none          # ArgumentNullException throw helper not available for all targets
