@@ -48,4 +48,32 @@ public static class EquivalencyAssertionOptionsExtensions
                 .Should()
                 .BeCloseTo(ctx.Expectation, precision))
             .WhenTypeIs<DateTime>();
+
+    /// <summary>
+    /// Configures .BeEquivalentTo extensions to compare <see cref="JsonElement"/> by
+    /// comparing the underlying JSON string representation.
+    /// </summary>
+    /// <typeparam name="T">The generic parameter for the <see cref="EquivalencyAssertionOptions{T}"/>.</typeparam>
+    /// <param name="options">The <see cref="EquivalencyAssertionOptions{T}"/> to configure.</param>
+    /// <returns>The configured <see cref="EquivalencyAssertionOptions{T}"/>.</returns>
+    public static EquivalencyAssertionOptions<T> CompareJsonElementUsingJson<T>(
+        this EquivalencyAssertionOptions<T> options)
+        => options.Using(new JsonElementEquivalencyStep());
+
+    private sealed class JsonElementEquivalencyStep : IEquivalencyStep
+    {
+        public EquivalencyResult Handle(Comparands comparands, IEquivalencyValidationContext context, IEquivalencyValidator nestedValidator)
+        {
+            if (comparands.Subject is not JsonElement subject ||
+                comparands.Expectation is not JsonElement expectation)
+            {
+                return EquivalencyResult.ContinueWithNext;
+            }
+
+            var newComparands = new Comparands(subject.GetRawText(), expectation.GetRawText(), typeof(string));
+            nestedValidator.RecursivelyAssertEquality(newComparands, context);
+
+            return EquivalencyResult.AssertionCompleted;
+        }
+    }
 }
