@@ -15,13 +15,29 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
 
     public override IEnumerable<object[]> GetData(MethodInfo testMethod)
     {
+        var parameters = testMethod.GetParameters();
+        var frozenValues = parameters
+            .Select((p, i) => (Index: i, Parameter: p, p.ParameterType))
+            .Where(x => x.Parameter.GetCustomAttribute<FrozenAttribute>() != null)
+            .ToArray();
+        var injectMethod = typeof(FixtureRegistrar)
+            .GetMethod(
+                nameof(FixtureRegistrar.Inject),
+                BindingFlags.Public | BindingFlags.Static);
+
         var data = base.GetData(testMethod);
         foreach (var values in data)
         {
             var fixture = FixtureFactory.Create();
+            foreach (var frozenValue in frozenValues)
+            {
+                injectMethod?
+                    .MakeGenericMethod(frozenValue.ParameterType)
+                    .Invoke(null, [fixture, values[frozenValue.Index]]);
+            }
+
             yield return values
-                .Concat(testMethod
-                    .GetParameters()
+                .Concat(parameters
                     .Skip(values.Length)
                     .Select(p => GetSpecimen(fixture, p)))
                 .ToArray();
