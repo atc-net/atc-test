@@ -1,4 +1,6 @@
 // ReSharper disable AsyncVoidLambda
+using NSubstitute.Exceptions;
+
 namespace Atc.Test;
 
 /// <summary>
@@ -83,20 +85,29 @@ public static class SubstituteExtensions
         TimeSpan timeout = default)
         where T : class
     {
-        var completion = new TaskCompletionSource<bool>();
-        substitute
-            .When(substituteCall)
-            .Do(_ => completion.TrySetResult(true));
+        try
+        {
+            substitute
+                .ValidateCallReceived(
+                    substituteCall,
+                    MatchArgs.AsSpecifiedInCall);
+        }
+        catch (ReceivedCallsException)
+        {
+            var completion = new TaskCompletionSource<bool>();
+            substitute
+                .When(substituteCall)
+                .Do(_ => completion.TrySetResult(true));
 
-        await completion
-            .WaitForCompletion(timeout)
-            .ConfigureAwait(false);
+            await completion
+                .WaitForCompletion(timeout)
+                .ConfigureAwait(false);
 
-        substitute
-            .ValidateCallReceived(
-                substituteCall
-                ?? throw new ArgumentNullException(nameof(substituteCall)),
-                MatchArgs.AsSpecifiedInCall);
+            substitute
+                .ValidateCallReceived(
+                    substituteCall,
+                    MatchArgs.AsSpecifiedInCall);
+        }
     }
 
     /// <summary>
@@ -114,19 +125,29 @@ public static class SubstituteExtensions
         TimeSpan timeout = default)
         where T : class
     {
-        var completion = new TaskCompletionSource<bool>();
-        substitute
-            .When(substituteCall)
-            .Do(_ => completion.TrySetResult(true));
+        try
+        {
+            substitute
+                .ValidateCallReceived(
+                    x => substituteCall(x),
+                    MatchArgs.AsSpecifiedInCall);
+        }
+        catch (ReceivedCallsException)
+        {
+            var completion = new TaskCompletionSource<bool>();
+            substitute
+                .When(substituteCall)
+                .Do(_ => completion.TrySetResult(true));
 
-        await completion
-            .WaitForCompletion(timeout)
-            .ConfigureAwait(false);
+            await completion
+                .WaitForCompletion(timeout)
+                .ConfigureAwait(false);
 
-        substitute
-            .ValidateCallReceived(
-                x => substituteCall(x),
-                MatchArgs.AsSpecifiedInCall);
+            substitute
+                .ValidateCallReceived(
+                    x => substituteCall(x),
+                    MatchArgs.AsSpecifiedInCall);
+        }
     }
 
     /// <summary>
@@ -139,26 +160,40 @@ public static class SubstituteExtensions
     /// <param name="substituteCall">The call to wait for.</param>
     /// <param name="timeout">Timeout for the wait operation.</param>
     /// <returns>A task representing the async operation.</returns>
+    [SuppressMessage(
+        "Reliability",
+        "CA2012:Use ValueTasks correctly",
+        Justification = "Call should not be awaited for route to work")]
     public static async Task WaitForCall<TSubstitute, TResult>(
         this TSubstitute substitute,
         Func<TSubstitute, ValueTask<TResult>> substituteCall,
         TimeSpan timeout = default)
         where TSubstitute : class
     {
-        var completion = new TaskCompletionSource<bool>();
-        substitute
-            .When(substituteCall)
-            .Do(_ => completion.TrySetResult(true));
+        try
+        {
+            substitute
+                .ValidateCallReceived(
+                    x => substituteCall(x),
+                    MatchArgs.AsSpecifiedInCall);
+        }
+        catch (ReceivedCallsException)
+        {
+            var completion = new TaskCompletionSource<bool>();
+            substitute
+                .When(substituteCall)
+                .Do(_ => completion.TrySetResult(true));
 
-        await completion
-            .WaitForCompletion(timeout)
-            .ConfigureAwait(false);
+            await completion
+                .WaitForCompletion(timeout)
+                .ConfigureAwait(false);
 
-        substitute
-            .ValidateCallReceived(
-                async x => await substituteCall(x)
-                    .ConfigureAwait(false),
-                MatchArgs.AsSpecifiedInCall);
+            substitute
+                .ValidateCallReceived(
+                    x => substituteCall(x)
+                        .ConfigureAwait(false),
+                    MatchArgs.AsSpecifiedInCall);
+        }
     }
 
     /// <summary>
@@ -176,20 +211,29 @@ public static class SubstituteExtensions
         TimeSpan timeout = default)
         where T : class
     {
-        var completion = new TaskCompletionSource<bool>();
-        substitute
-            .WhenForAnyArgs(substituteCall)
-            .Do(_ => completion.TrySetResult(true));
+        try
+        {
+            substitute
+                .ValidateCallReceived(
+                    substituteCall,
+                    MatchArgs.Any);
+        }
+        catch (ReceivedCallsException)
+        {
+            var completion = new TaskCompletionSource<bool>();
+            substitute
+                .WhenForAnyArgs(substituteCall)
+                .Do(_ => completion.TrySetResult(true));
 
-        await completion
-            .WaitForCompletion(timeout)
-            .ConfigureAwait(false);
+            await completion
+                .WaitForCompletion(timeout)
+                .ConfigureAwait(false);
 
-        substitute
-            .ValidateCallReceived(
-                substituteCall
-                ?? throw new ArgumentNullException(nameof(substituteCall)),
-                MatchArgs.Any);
+            substitute
+                .ValidateCallReceived(
+                    substituteCall,
+                    MatchArgs.Any);
+        }
     }
 
     /// <summary>
@@ -207,19 +251,29 @@ public static class SubstituteExtensions
         TimeSpan timeout = default)
         where T : class
     {
-        var completion = new TaskCompletionSource<bool>();
-        substitute
-            .WhenForAnyArgs(substituteCall)
-            .Do(_ => completion.TrySetResult(true));
+        try
+        {
+            substitute
+                .ValidateCallReceived(
+                    x => substituteCall(x),
+                    MatchArgs.Any);
+        }
+        catch (ReceivedCallsException)
+        {
+            var completion = new TaskCompletionSource<bool>();
+            substitute
+                .WhenForAnyArgs(substituteCall)
+                .Do(_ => completion.TrySetResult(true));
 
-        await completion
-            .WaitForCompletion(timeout)
-            .ConfigureAwait(false);
+            await completion
+                .WaitForCompletion(timeout)
+                .ConfigureAwait(false);
 
-        substitute
-            .ValidateCallReceived(
-                x => substituteCall(x),
-                MatchArgs.Any);
+            substitute
+                .ValidateCallReceived(
+                    x => substituteCall(x),
+                    MatchArgs.Any);
+        }
     }
 
     /// <summary>
@@ -232,26 +286,39 @@ public static class SubstituteExtensions
     /// <param name="substituteCall">The call to wait for.</param>
     /// <param name="timeout">Timeout for the wait operation.</param>
     /// <returns>A task representing the async operation.</returns>
+    [SuppressMessage(
+        "Reliability",
+        "CA2012:Use ValueTasks correctly",
+        Justification = "Call should not be awaited for route to work")]
     public static async Task WaitForCallForAnyArgs<TSubstitute, TResult>(
         this TSubstitute substitute,
         Func<TSubstitute, ValueTask<TResult>> substituteCall,
         TimeSpan timeout = default)
         where TSubstitute : class
     {
-        var completion = new TaskCompletionSource<bool>();
-        substitute
-            .WhenForAnyArgs(substituteCall)
-            .Do(_ => completion.TrySetResult(true));
+        try
+        {
+            substitute
+                .ValidateCallReceived(
+                    x => substituteCall(x),
+                    MatchArgs.Any);
+        }
+        catch (ReceivedCallsException)
+        {
+            var completion = new TaskCompletionSource<bool>();
+            substitute
+                .WhenForAnyArgs(substituteCall)
+                .Do(_ => completion.TrySetResult(true));
 
-        await completion
-            .WaitForCompletion(timeout)
-            .ConfigureAwait(false);
+            await completion
+                .WaitForCompletion(timeout)
+                .ConfigureAwait(false);
 
-        substitute
-            .ValidateCallReceived(
-                async x => await substituteCall(x)
-                    .ConfigureAwait(false),
-                MatchArgs.Any);
+            substitute
+                .ValidateCallReceived(
+                    x => substituteCall(x),
+                    MatchArgs.Any);
+        }
     }
 
     private static void ValidateCallReceived<T>(
