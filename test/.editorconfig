@@ -63,3 +63,4 @@ dotnet_diagnostic.SA1202.severity = none            # Private helper methods mak
 dotnet_diagnostic.CA2201.severity = none            # Instantiating Exceptions as test data should be allowed.
 dotnet_diagnostic.CA1711.severity = none            # Identifiers should not have incorrect suffix
 dotnet_diagnostic.S2344.severity = none             # Enumeration type names should not have "Flags" or "Enum" suffixes
+dotnet_diagnostic.CA1515.severity = none            # CA1515: Consider making public types internal

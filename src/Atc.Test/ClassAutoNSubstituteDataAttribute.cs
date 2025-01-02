@@ -31,9 +31,12 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
             var fixture = FixtureFactory.Create();
             foreach (var frozenValue in frozenValues)
             {
-                injectMethod?
-                    .MakeGenericMethod(frozenValue.ParameterType)
-                    .Invoke(null, [fixture, values[frozenValue.Index]]);
+                if (values.Length > frozenValue.Index)
+                {
+                    injectMethod?
+                        .MakeGenericMethod(frozenValue.ParameterType)
+                        .Invoke(null, [fixture, values[frozenValue.Index]]);
+                }
             }
 
             yield return values
