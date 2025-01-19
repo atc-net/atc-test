@@ -1,13 +1,13 @@
 namespace Atc.Test.Tests;
 
-public class MemberAutoNSubstituteDataAttributeTests
+public sealed class MemberAutoNSubstituteDataAttributeTests
 {
-    public static readonly IEnumerable<object[]> MemberData = new[]
-    {
-        new object[] { SampleEnum.One },
-        new object[] { SampleEnum.Two },
-        new object[] { SampleEnum.Three },
-    };
+    public static readonly IEnumerable<object[]> MemberData =
+    [
+        [SampleEnum.One],
+        [SampleEnum.Two],
+        [SampleEnum.Three]
+    ];
 
     [Theory]
     [MemberAutoNSubstituteData(nameof(MemberData))]
@@ -26,15 +26,15 @@ public class MemberAutoNSubstituteDataAttributeTests
         dependantType.Dependency.Should().Be(interfaceType);
     }
 
-    public static readonly IEnumerable<object[]> MemberDataMultipleValues = new[]
-    {
-        new object[] { SampleEnum.One, SampleEnum.Two },
-        new object[] { SampleEnum.One, SampleEnum.One },
-    };
+    public static readonly IEnumerable<object[]> MemberDataMultipleValues =
+    [
+        [SampleEnum.One, SampleEnum.Two],
+        [SampleEnum.One, SampleEnum.One]
+    ];
 
     [Theory]
     [MemberAutoNSubstituteData(nameof(MemberDataMultipleValues))]
-    public void MemberAutoNSubstituteData_Should_Call_For_Each_MemderData_Values(
+    public void MemberAutoNSubstituteData_Should_Call_For_Each_MemberData_Values(
         SampleEnum firstValue,
         SampleEnum secondValue,
         [Frozen] ISampleInterface interfaceType,

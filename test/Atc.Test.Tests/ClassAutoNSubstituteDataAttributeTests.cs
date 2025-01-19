@@ -1,6 +1,6 @@
 namespace Atc.Test.Tests;
 
-public class ClassAutoNSubstituteDataAttributeTests
+public sealed class ClassAutoNSubstituteDataAttributeTests
 {
     public class TestData : TheoryData<SampleEnum>
     {
