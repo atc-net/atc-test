@@ -1,6 +1,6 @@
 namespace Atc.Test.Tests;
 
-public class StringExtensionsTests
+public sealed class StringExtensionsTests
 {
     [Theory]
     [InlineData("Double  Space", "Double Space")]

@@ -1,6 +1,6 @@
 namespace Atc.Test.Tests;
 
-public class AutoNSubstituteDataAttributeTests
+public sealed class AutoNSubstituteDataAttributeTests
 {
     [Theory, AutoNSubstituteData]
     public void Should_Create_Concrete_Type_With_AutoFixture(
