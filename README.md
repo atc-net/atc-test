@@ -22,10 +22,6 @@ Typical test project (excerpt):
     <PackageReference Include="xunit.v3" Version="3.0.1" />
     <PackageReference Include="Atc.Test" Version="$(LatestOrPinned)" />
   </ItemGroup>
-  <!-- Remove legacy AutoFixture.Xunit2 using if brought transitively -->
-  <ItemGroup>
-    <Using Remove="AutoFixture.Xunit2" />
-  </ItemGroup>
 </Project>
 ```
 
