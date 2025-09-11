@@ -11,7 +11,13 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
     public ClassAutoNSubstituteDataAttribute(Type @class)
         : base(@class)
     {
+        Class = @class;
     }
+
+    /// <summary>
+    /// Gets the class type that provides the enumerable data.
+    /// </summary>
+    public new Type Class { get; }
 
     public override async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
         MethodInfo testMethod,
