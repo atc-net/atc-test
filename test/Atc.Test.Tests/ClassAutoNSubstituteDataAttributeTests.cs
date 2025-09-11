@@ -6,9 +6,9 @@ public sealed class ClassAutoNSubstituteDataAttributeTests
     {
         public TestData()
         {
-            AddRow(SampleEnum.One);
-            AddRow(SampleEnum.Two);
-            AddRow(SampleEnum.Three);
+            Add(SampleEnum.One);
+            Add(SampleEnum.Two);
+            Add(SampleEnum.Three);
         }
     }
 
