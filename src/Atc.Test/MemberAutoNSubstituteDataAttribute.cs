@@ -18,7 +18,19 @@ public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
     public MemberAutoNSubstituteDataAttribute(string memberName, params object[] parameters)
         : base(memberName, parameters)
     {
+        MemberName = memberName;
+        Parameters = parameters;
     }
+
+    /// <summary>
+    /// Gets the member name passed to the constructor.
+    /// </summary>
+    public new string MemberName { get; }
+
+    /// <summary>
+    /// Gets the parameter values passed to the constructor (for method members).
+    /// </summary>
+    public object[] Parameters { get; }
 
     public override async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
         MethodInfo testMethod,
