@@ -6,7 +6,7 @@ public sealed class MemberAutoNSubstituteDataAttributeTests
     [
         [SampleEnum.One],
         [SampleEnum.Two],
-        [SampleEnum.Three]
+        [SampleEnum.Three],
     ];
 
     [Theory]
