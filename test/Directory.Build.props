@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <Using Include="AutoFixture" />
-    <Using Include="AutoFixture.Xunit2" />
+    <Using Include="AutoFixture.Xunit3" />
     <Using Include="FluentAssertions" />
     <Using Include="NSubstitute" />
     <Using Include="Xunit" />
