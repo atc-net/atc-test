@@ -13,7 +13,6 @@ namespace Atc.Test;
 /// IEnumerable&lt;object[]&gt; with the test data.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-[DataDiscoverer("Xunit.Sdk.MemberDataDiscoverer", "xunit.core")]
 public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
 {
     public MemberAutoNSubstituteDataAttribute(string memberName, params object[] parameters)
@@ -21,23 +20,36 @@ public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
     {
     }
 
-    protected override object[] ConvertDataItem(MethodInfo testMethod, object item)
+    public override async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
+        MethodInfo testMethod,
+        DisposalTracker disposalTracker)
     {
-        if (item is not object[] values)
+        var baseRows = await base.GetData(testMethod, disposalTracker).ConfigureAwait(false);
+        var parameters = testMethod.GetParameters();
+        var augmented = new List<ITheoryDataRow>(baseRows.Count);
+
+        foreach (var row in baseRows)
         {
-            throw new ArgumentException(
-                $"Property {MemberName} on {MemberType.Name} yielded an item that is not an object[]",
-                nameof(item));
+            var data = row.GetData();
+            var fixture = FixtureFactory.Create();
+            var extendedData = data
+                .Concat(parameters
+                    .Skip(data.Length)
+                    .Select(p => GetSpecimen(fixture, p)))
+                .ToArray();
+
+            augmented.Add(new TheoryDataRow(extendedData)
+            {
+                Explicit = row.Explicit,
+                Label = row.Label,
+                Skip = row.Skip,
+                TestDisplayName = row.TestDisplayName,
+                Timeout = row.Timeout,
+                Traits = row.Traits ?? new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase),
+            });
         }
 
-        var fixture = FixtureFactory.Create();
-
-        return values
-            .Concat(testMethod
-                .GetParameters()
-                .Skip(values.Length)
-                .Select(p => GetSpecimen(fixture, p)))
-            .ToArray();
+        return augmented;
     }
 
     private static object GetSpecimen(
