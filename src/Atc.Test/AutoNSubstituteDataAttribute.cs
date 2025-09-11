@@ -14,7 +14,7 @@ public sealed class AutoNSubstituteDataAttribute : AutoDataAttribute
     /// Initializes a new instance of the <see cref="AutoNSubstituteDataAttribute"/> class.
     /// </summary>
     public AutoNSubstituteDataAttribute()
-        : base(FixtureFactory.Create)
+        : base(() => global::Atc.Test.FixtureFactory.Create())
     {
     }
 }
