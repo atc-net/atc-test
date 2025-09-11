@@ -13,38 +13,56 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
     {
     }
 
-    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+    public override async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
+        MethodInfo testMethod,
+        DisposalTracker disposalTracker)
     {
+        var baseRows = await base.GetData(testMethod, disposalTracker).ConfigureAwait(false);
         var parameters = testMethod.GetParameters();
         var frozenValues = parameters
             .Select((p, i) => (Index: i, Parameter: p, p.ParameterType))
             .Where(x => x.Parameter.GetCustomAttribute<FrozenAttribute>() != null)
             .ToArray();
-        var injectMethod = typeof(FixtureRegistrar)
-            .GetMethod(
-                nameof(FixtureRegistrar.Inject),
-                BindingFlags.Public | BindingFlags.Static);
+        var injectMethod = typeof(FixtureRegistrar).GetMethod(
+            nameof(FixtureRegistrar.Inject),
+            BindingFlags.Public | BindingFlags.Static);
 
-        var data = base.GetData(testMethod);
-        foreach (var values in data)
+        var augmented = new List<ITheoryDataRow>(baseRows.Count);
+        foreach (var row in baseRows)
         {
+            var originalData = row.GetData();
             var fixture = FixtureFactory.Create();
+
+            // Inject frozen values if present in source data.
             foreach (var frozenValue in frozenValues)
             {
-                if (values.Length > frozenValue.Index)
+                if (originalData.Length > frozenValue.Index)
                 {
                     injectMethod?
                         .MakeGenericMethod(frozenValue.ParameterType)
-                        .Invoke(null, [fixture, values[frozenValue.Index]]);
+                        .Invoke(null, [fixture, originalData[frozenValue.Index]]);
                 }
             }
 
-            yield return values
+            var extendedData = originalData
                 .Concat(parameters
-                    .Skip(values.Length)
+                    .Skip(originalData.Length)
                     .Select(p => GetSpecimen(fixture, p)))
                 .ToArray();
+
+            // Preserve metadata from original row where possible.
+            augmented.Add(new TheoryDataRow(extendedData)
+            {
+                Explicit = row.Explicit,
+                Label = row.Label,
+                Skip = row.Skip,
+                TestDisplayName = row.TestDisplayName,
+                Timeout = row.Timeout,
+                Traits = row.Traits ?? new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase),
+            });
         }
+
+        return augmented;
     }
 
     private static object GetSpecimen(
