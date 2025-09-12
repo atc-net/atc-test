@@ -50,4 +50,34 @@ public sealed class MemberAutoNSubstituteDataAttributeTests
         dependantType.Should().NotBeNull();
         dependantType.Dependency.Should().Be(interfaceType);
     }
+
+    [Theory]
+    [MemberAutoNSubstituteData(nameof(DataFrozenProvided))]
+    public void MemberData_SuppliesValueForFrozenParameter_ReusedForDependants(
+        [Frozen] ISampleInterface frozen,
+        SampleDependantClass dependant)
+    {
+        frozen.Should().NotBeNull();
+        dependant.Should().NotBeNull();
+        dependant.Dependency.Should().BeSameAs(frozen);
+    }
+
+    [Theory]
+    [MemberAutoNSubstituteData(nameof(DataFrozenProvided))]
+    public void MemberData_SuppliesValueEarlier_ReusedByLaterFrozenParameter(
+        ISampleInterface provided,
+        [Frozen] ISampleInterface frozen,
+        SampleDependantClass dependant)
+    {
+        provided.Should().NotBeNull();
+        frozen.Should().NotBeNull();
+        dependant.Should().NotBeNull();
+        frozen.Should().BeSameAs(provided);
+        dependant.Dependency.Should().BeSameAs(provided);
+    }
+
+    public static IEnumerable<object?[]> DataFrozenProvided()
+    {
+        yield return [Substitute.For<ISampleInterface>()];
+    }
 }
