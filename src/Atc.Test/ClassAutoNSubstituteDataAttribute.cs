@@ -19,6 +19,20 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
     /// </summary>
     public new Type Class { get; }
 
+    /// <summary>
+    /// Combines class-provided data rows with AutoFixture generated specimens, honoring any <see cref="FrozenAttribute"/> parameters.
+    /// </summary>
+    /// <param name="testMethod">The target test method.</param>
+    /// <param name="disposalTracker">xUnit disposal tracker (not directly used).</param>
+    /// <returns>Augmented data rows with original supplied values followed by generated specimens.</returns>
+    /// <remarks>
+    /// For each row:
+    /// 1. Create a fresh fixture.
+    /// 2. Inject supplied values that map to [Frozen] parameters (positional only).
+    /// 3. Generate remaining parameters via <see cref="GetSpecimen(IFixture, ParameterInfo)"/>.
+    /// 4. Preserve original row metadata.
+    /// Unlike member attribute handling, no promotion step is required because class data enumeration typically aligns positions directly.
+    /// </remarks>
     public override async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
         MethodInfo testMethod,
         DisposalTracker disposalTracker)
@@ -33,22 +47,27 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
             nameof(FixtureRegistrar.Inject),
             BindingFlags.Public | BindingFlags.Static);
 
-        var augmented = new List<ITheoryDataRow>(baseRows.Count);
-        foreach (var row in baseRows)
+        void InjectFrozen(object?[] originalData, IFixture f)
         {
-            var originalData = row.GetData();
-            var fixture = FixtureFactory.Create();
-
-            // Inject frozen values if present in source data.
             foreach (var frozenValue in frozenValues)
             {
                 if (originalData.Length > frozenValue.Index)
                 {
                     injectMethod?
                         .MakeGenericMethod(frozenValue.ParameterType)
-                        .Invoke(null, [fixture, originalData[frozenValue.Index]]);
+                        .Invoke(null, [f, originalData[frozenValue.Index]]);
                 }
             }
+        }
+
+        var augmented = new List<ITheoryDataRow>(baseRows.Count);
+        foreach (var row in baseRows)
+        {
+            var originalData = row.GetData();
+            var fixture = FixtureFactory.Create();
+
+            // Inject frozen values if present in source data (positional only for class data).
+            InjectFrozen(originalData, fixture);
 
             var extendedData = originalData
                 .Concat(parameters
@@ -71,6 +90,16 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
         return augmented;
     }
 
+    /// <summary>
+    /// Resolves a specimen for the given parameter applying parameter-level customizations prior to resolution.
+    /// </summary>
+    /// <param name="fixture">The per-row fixture instance.</param>
+    /// <param name="parameter">The parameter to resolve.</param>
+    /// <returns>The resolved specimen instance.</returns>
+    /// <remarks>
+    /// Customizations are ordered so non-frozen behaviors apply before any potential freezing to ensure
+    /// a final form is captured when freezing occurs.
+    /// </remarks>
     private static object GetSpecimen(
         IFixture fixture,
         ParameterInfo parameter)
