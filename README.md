@@ -87,6 +87,79 @@ All remaining parameters (after those satisfied by inline/member data) are popul
 > **Note:**
 > NSubstitute is used when the type being created is an interface or abstract class.
 
+### Frozen Reuse Scenarios
+
+When you decorate a parameter with `[Frozen]`, its resolved instance is reused for any other specimens needing that type. The `MemberAutoNSubstituteData` attribute supports an additional convenience: **exact-type promotion** of an earlier supplied value to a later `[Frozen]` parameter whose slot was not part of the supplied member row.
+
+| Scenario | Attribute | Behavior |
+|----------|-----------|----------|
+| Positional frozen reuse | `ClassAutoNSubstituteData` + `MemberAutoNSubstituteData` | If the data row supplies a value at the same parameter index as a `[Frozen]` parameter, that value is frozen and reused. |
+| Exact-type promotion (member data only) | `MemberAutoNSubstituteData` | If a later `[Frozen] T` parameter has no supplied value (index beyond row length), we look for an earlier supplied value whose parameter type is exactly `T` and freeze it. |
+| No interface/base promotion | Both | We do NOT promote across interface or base types—only exact parameter type matches. |
+
+#### 1. Positional Reuse
+
+```csharp
+[Theory]
+[InlineAutoNSubstituteData(42)]
+public void Positional_Frozen_Reuses_Inline_Value(
+  [Frozen] int number, // inline supplies index 0 -> frozen
+  SomeConsumer consumer) // receives the same number if it depends on it
+{
+  consumer.NumberDependency.Should().Be(number);
+}
+```
+
+#### 2. Exact-Type Promotion (Member Data Only)
+
+```csharp
+public static IEnumerable<object?[]> ServiceRow() => new []
+{
+  new object?[] { Substitute.For<IMyService>() } // supplies parameter 0 only
+};
+
+[Theory]
+[MemberAutoNSubstituteData(nameof(ServiceRow))]
+public void Promotion_Reuses_Earlier_Same_Type(
+  IMyService supplied,              // index 0 supplied
+  [Frozen] IMyService frozenLater,  // not supplied -> promoted reuse
+  NeedsService consumer)            // receives frozen instance
+{
+  frozenLater.Should().BeSameAs(supplied);
+  consumer.Service.Should().BeSameAs(supplied);
+}
+```
+
+#### 3. Non-Promotion Across Different Interfaces
+
+```csharp
+public interface IFoo {}
+public interface IBar {}
+public class DualImpl : IFoo, IBar {}
+
+public static IEnumerable<object?[]> DualRow() => new []
+{
+  new object?[] { new DualImpl() } // supplies IFoo parameter only
+};
+
+[Theory]
+[MemberAutoNSubstituteData(nameof(DualRow))]
+public void Different_Interface_Not_Promoted(
+  IFoo foo,                // supplied DualImpl
+  [Frozen] IBar bar,       // exact-type mismatch (IBar vs IFoo) -> NOT reused
+  UsesBar consumer)
+{
+  bar.Should().NotBeSameAs(foo);          // separate instance
+  consumer.Bar.Should().BeSameAs(bar);    // consumer wired to frozen IBar
+}
+```
+
+Design Rationale:
+
+- Class data is typically authored with full positional intent—implicit promotion could hide mistakes.
+- Member data commonly supplies only a prefix, so exact-type promotion avoids boilerplate duplication while staying predictable.
+- Restricting to exact type (no interface/base assignability) prevents accidental cross-interface freezes (e.g., a dual-implemented object hijacking a different abstraction).
+
 ## Test Helpers
 
 | Name | Description |
