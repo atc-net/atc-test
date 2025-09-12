@@ -111,4 +111,54 @@ public sealed class MemberAutoNSubstituteDataAttributeTests
     {
         yield return [new DualInterfaceImpl { Name = "n", Description = "d" }];
     }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Multiple_Frozen_Same_Type_Should_Reference_Same_Instance(
+        [Frozen] ISampleInterface first,
+        [Frozen] ISampleInterface second,
+        SampleDependantClass dependant)
+    {
+        first.Should().NotBeNull();
+        second.Should().NotBeNull();
+        first.Should().BeSameAs(second);
+        dependant.Dependency.Should().BeSameAs(first);
+    }
+
+    [Theory]
+    [MemberAutoNSubstituteData(nameof(DataSingleProvidedInterface))]
+    public void Earlier_Single_Supplied_Value_Reused_For_Multiple_Later_Frozens(
+        ISampleInterface supplied,
+        [Frozen] ISampleInterface frozen1,
+        [Frozen] ISampleInterface frozen2,
+        SampleDependantClass dependant)
+    {
+        supplied.Should().NotBeNull();
+        frozen1.Should().BeSameAs(supplied);
+        frozen2.Should().BeSameAs(supplied);
+        dependant.Dependency.Should().BeSameAs(supplied);
+    }
+
+    public static IEnumerable<object?[]> DataSingleProvidedInterface()
+    {
+        yield return [Substitute.For<ISampleInterface>()];
+    }
+
+    [Theory]
+    [MemberAutoNSubstituteData(nameof(DataMultipleSameTypeProvided))]
+    public void Promotion_Uses_Earliest_Supplied_Instance(
+        ISampleInterface firstProvided,
+        ISampleInterface secondProvided,
+        [Frozen] ISampleInterface frozen,
+        SampleDependantClass dependant)
+    {
+        firstProvided.Should().NotBeSameAs(secondProvided); // separate substitutes
+        frozen.Should().BeSameAs(firstProvided); // earliest should win
+        dependant.Dependency.Should().BeSameAs(firstProvided);
+    }
+
+    public static IEnumerable<object?[]> DataMultipleSameTypeProvided()
+    {
+        yield return [Substitute.For<ISampleInterface>(), Substitute.For<ISampleInterface>()];
+    }
 }
