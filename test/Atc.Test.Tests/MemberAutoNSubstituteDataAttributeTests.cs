@@ -80,4 +80,35 @@ public sealed class MemberAutoNSubstituteDataAttributeTests
     {
         yield return [Substitute.For<ISampleInterface>()];
     }
+
+    // Negative promotion scenario
+    // We provide an earlier argument typed as IFirstInterface whose concrete instance also
+    // implements ISecondInterface. The later parameter is [Frozen] ISecondInterface. Desired
+    // invariant: the framework should NOT promote the earlier IFirstInterface value to satisfy
+    // the frozen ISecondInterface; a distinct instance should be generated/injected instead.
+    // Current promotion logic (Type.IsInstanceOfType) is broad and WILL incorrectly reuse it.
+    // This test therefore initially fails (red) and will pass after tightening promotion logic
+    // in the upcoming refactor (shared frozen helper with exact-type matching / index mapping).
+    [Theory]
+    [MemberAutoNSubstituteData(nameof(DualInterfaceProvidedData))]
+    public void MemberData_DifferentInterface_NotPromoted(
+        IFirstInterface first,
+        [Frozen] ISecondInterface second,
+        SecondInterfaceDependant dependant)
+    {
+        first.Should().NotBeNull();
+        second.Should().NotBeNull();
+        dependant.Should().NotBeNull();
+
+        // Guard: dependant wired to the frozen instance.
+        dependant.Dependency.Should().BeSameAs(second);
+
+        // Specification: these should NOT be the same instance
+        second.Should().NotBeSameAs(first);
+    }
+
+    public static IEnumerable<object?[]> DualInterfaceProvidedData()
+    {
+        yield return [new DualInterfaceImpl { Name = "n", Description = "d" }];
+    }
 }
