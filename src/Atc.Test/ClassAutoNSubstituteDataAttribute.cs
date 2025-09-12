@@ -39,26 +39,9 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
     {
         var baseRows = await base.GetData(testMethod, disposalTracker).ConfigureAwait(false);
         var parameters = testMethod.GetParameters();
-        var frozenValues = parameters
-            .Select((p, i) => (Index: i, Parameter: p, p.ParameterType))
-            .Where(x => x.Parameter.GetCustomAttribute<FrozenAttribute>() != null)
-            .ToArray();
-        var injectMethod = typeof(FixtureRegistrar).GetMethod(
-            nameof(FixtureRegistrar.Inject),
-            BindingFlags.Public | BindingFlags.Static);
 
-        void InjectFrozen(object?[] originalData, IFixture f)
-        {
-            foreach (var frozenValue in frozenValues)
-            {
-                if (originalData.Length > frozenValue.Index)
-                {
-                    injectMethod?
-                        .MakeGenericMethod(frozenValue.ParameterType)
-                        .Invoke(null, [f, originalData[frozenValue.Index]]);
-                }
-            }
-        }
+        // Build injector with promotion disabled (class data relies purely on positional alignment).
+        var frozenInjector = FrozenParameterInjector.Build(parameters, enableExactTypePromotion: false);
 
         var augmented = new List<ITheoryDataRow>(baseRows.Count);
         foreach (var row in baseRows)
@@ -66,8 +49,8 @@ public sealed class ClassAutoNSubstituteDataAttribute : ClassDataAttribute
             var originalData = row.GetData();
             var fixture = FixtureFactory.Create();
 
-            // Inject frozen values if present in source data (positional only for class data).
-            InjectFrozen(originalData, fixture);
+            // Inject frozen values if present in source data (positional only).
+            frozenInjector(originalData, fixture);
 
             var extendedData = originalData
                 .Concat(parameters

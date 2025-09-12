@@ -55,8 +55,8 @@ public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
         var parameters = testMethod.GetParameters();
         var augmented = new List<ITheoryDataRow>(baseRows.Count);
 
-        // Pre-compute an injector tailored to the frozen parameters of this method.
-        var frozenInjector = BuildFrozenInjector(parameters);
+        // Pre-compute an injector tailored to the frozen parameters of this method (with exact-type promotion enabled).
+        var frozenInjector = FrozenParameterInjector.Build(parameters, enableExactTypePromotion: true);
 
         foreach (var row in baseRows)
         {
@@ -84,67 +84,6 @@ public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
         }
 
         return augmented;
-    }
-
-    /// <summary>
-    /// Builds a delegate that performs two-phase frozen value handling for the supplied test method parameters.
-    /// </summary>
-    /// <param name="parameters">Ordered parameter list from the test method.</param>
-    /// <returns>An action taking (suppliedRowValues, fixture) which injects any frozen instances.</returns>
-    /// <remarks>
-    /// Phase 1 (Direct): For each parameter marked with <see cref="FrozenAttribute"/>, if the member row already
-    /// supplies a value at the same index, that instance is injected (frozen) into the fixture.
-    /// Phase 2 (Promotion): For frozen parameters whose index exceeds the supplied row length, the earliest
-    /// previously supplied compatible instance (assignable type) is promoted and injected. This enables scenarios
-    /// where the developer supplies a value earlier and later annotates a parameter of the same type with [Frozen].
-    /// </remarks>
-    private static Action<object?[], IFixture> BuildFrozenInjector(ParameterInfo[] parameters)
-    {
-        // Identify parameters decorated with [Frozen]; capture index + type for later injection/promotion.
-        var frozenParameters = parameters
-            .Select((p, i) => (Index: i, Type: p.ParameterType, Frozen: p.GetCustomAttribute<FrozenAttribute>()))
-            .Where(x => x.Frozen is not null)
-            .ToArray();
-
-        if (frozenParameters.Length == 0)
-        {
-            // Fast path: no frozen parameters -> no-op.
-            return static (_, _) => { };
-        }
-
-        var injectMethod = typeof(FixtureRegistrar).GetMethod(
-            nameof(FixtureRegistrar.Inject),
-            BindingFlags.Public | BindingFlags.Static);
-
-        return (suppliedData, fixture) =>
-        {
-            // Phase 1: Direct positional injections for frozen parameters already covered by supplied row data.
-            foreach (var frozen in frozenParameters)
-            {
-                if (suppliedData.Length > frozen.Index)
-                {
-                    injectMethod?
-                        .MakeGenericMethod(frozen.Type)
-                        .Invoke(null, [fixture, suppliedData[frozen.Index]]);
-                }
-            }
-
-            // Phase 2: Promotions – for frozen parameters whose index is beyond supplied data length,
-            // attempt to reuse an earlier compatible supplied argument (interface / base type friendly).
-            foreach (var frozen in frozenParameters)
-            {
-                if (suppliedData.Length <= frozen.Index)
-                {
-                    var promoted = suppliedData.FirstOrDefault(d => d is not null && frozen.Type.IsInstanceOfType(d));
-                    if (promoted is not null)
-                    {
-                        injectMethod?
-                            .MakeGenericMethod(frozen.Type)
-                            .Invoke(null, [fixture, promoted]);
-                    }
-                }
-            }
-        };
     }
 
     /// <summary>
