@@ -4,31 +4,62 @@
 
 `Atc.Test` is a .NET helper library that streamlines authoring tests with xUnit v3, AutoFixture, NSubstitute, and FluentAssertions. It provides rich data attributes, automatic specimen customization, and ergonomic frozen value reuse to reduce ceremony and improve test readability.
 
+## Why Atc.Test
+
+> You can “just wire everything manually” with plain xUnit and hand‑rolled mocks—so why use this instead?
+
+| Problem Without | What You Gain With `Atc.Test` | Why It Matters Over Time |
+|-----------------|-------------------------------|--------------------------|
+| Repeating constructor/mocker boilerplate in every test | Parameter-only intent: you list just what the test cares about | Lower cognitive load; faster review – noise removed |
+| Fragile refactors (add a ctor param ⇒ touch many files) | Fixture-driven auto‑supply of new dependencies | Constructor churn becomes O(1) instead of O(N tests) |
+| Divergent ad‑hoc mock styles (naming, setup order) | Central factory + consistent frozen reuse semantics | Suite stays uniform; easier large-scale edits / audits |
+| Accidental duplicate substitutes for logically single collaborator | `[Frozen]` exact-type reuse + early supplied promotion (member data) | Prevents subtle mismatch bugs & expectation gaps |
+| Manual re-creation of “shared conventions” (recursion handling, generators) | One-time customization via `[AutoRegister]` | New test inherits standards automatically |
+| AI-generated setup drifts over time | Declarative attributes act as a stable policy layer | Reduces maintenance & future prompt dependency |
+
+### When It Delivers the Most Value
+
+* Mid/large test suites (hundreds+ of theory cases).
+* Domain services with evolving constructor graphs / dependencies.
+* Teams that value refactor safety and consistent test style.
+* Situations where only a few parameters per test truly matter.
+
+### When Bare xUnit (+ manual mocks) May Be Enough
+
+* Very small or short‑lived codebases.
+* Highly bespoke object graphs where you override almost every generated value anyway.
+* Educational contexts emphasizing explicit wiring for learning.
+
+### Summary
+
+`Atc.Test` trades a tiny amount of initial abstraction for compounding savings in refactors, readability, and consistency. AI can quickly generate boilerplate; this library’s value is eliminating the need for that boilerplate in the first place—and giving you a single, policy‑driven locus for customization and reuse.
+
 ## Table of Content
 
-- [Introduction](#introduction)
-- [Table of Content](#table-of-content)
-  - [Features](#features)
-  - [Getting Started](#getting-started)
-    - [Install Package](#install-package)
-    - [Why xUnit Must Be Referenced Directly](#why-xunit-must-be-referenced-directly)
-    - [First Test Examples](#first-test-examples)
-  - [Advanced Usage](#advanced-usage)
-    - [Frozen Reuse Scenarios](#frozen-reuse-scenarios)
-    - [Auto Registration of Customizations](#auto-registration-of-customizations)
-    - [Helper Extensions](#helper-extensions)
-  - [Requirements](#requirements)
-  - [How to Contribute](#how-to-contribute)
+* [Introduction](#introduction)
+    * [Why Atc.Test](#why-atctest)
+* [Table of Content](#table-of-content)
+    * [Features](#features)
+    * [Getting Started](#getting-started)
+        * [Install Package](#install-package)
+        * [Why xUnit Must Be Referenced Directly](#why-xunit-must-be-referenced-directly)
+        * [First Test Examples](#first-test-examples)
+    * [Advanced Usage](#advanced-usage)
+        * [Frozen Reuse Scenarios](#frozen-reuse-scenarios)
+        * [Auto Registration of Customizations](#auto-registration-of-customizations)
+        * [Helper Extensions](#helper-extensions)
+    * [Requirements](#requirements)
+    * [How to Contribute](#how-to-contribute)
 
 ## Features
 
-- Data attributes integrating AutoFixture + NSubstitute: `AutoNSubstituteData`, `InlineAutoNSubstituteData`, `MemberAutoNSubstituteData`, `ClassAutoNSubstituteData`.
-- Automatic interface/abstract substitution via NSubstitute.
-- Exact-type frozen promotion for member data (reuse supplied instance across later `[Frozen]` parameters).
-- Deterministic fixture configuration with opt‑in auto-registration of custom `ICustomization` / `ISpecimenBuilder` via `[AutoRegister]`.
-- Convenience extensions: equivalency options, substitute inspection helpers, task timeout helpers, object protected member access.
-- Multi-targeted (netstandard2.1, net8.0, net9.0) for broad compatibility.
-- Clear separation of concerns: you own the xUnit runner/version.
+* Data attributes integrating AutoFixture + NSubstitute: `AutoNSubstituteData`, `InlineAutoNSubstituteData`, `MemberAutoNSubstituteData`, `ClassAutoNSubstituteData`.
+* Automatic interface/abstract substitution via NSubstitute.
+* Exact-type frozen promotion for member data (reuse supplied instance across later `[Frozen]` parameters).
+* Deterministic fixture configuration with opt‑in auto-registration of custom `ICustomization` / `ISpecimenBuilder` via `[AutoRegister]`.
+* Convenience extensions: equivalency options, substitute inspection helpers, task timeout helpers, object protected member access.
+* Multi-targeted (netstandard2.1, net8.0, net9.0) for broad compatibility.
+* Clear separation of concerns: you own the xUnit runner/version.
 
 ## Getting Started
 
@@ -55,10 +86,10 @@ Add `Atc.Test` to your test project along with explicit references to xUnit and 
 
 `Atc.Test` depends on `xunit.v3.extensibility.core` (the extensibility surface) but intentionally does **not** bring in the `xunit.v3` meta-package:
 
-- Avoid NU1701 warnings from runner assets not targeting `netstandard2.1`.
-- Let you pin or float the xUnit version independently.
-- Keep framework + runner decisions in your test project for predictable upgrades.
-- Preserve the library’s focus: providing attributes/utilities instead of prescribing test infrastructure.
+* Avoid NU1701 warnings from runner assets not targeting `netstandard2.1`.
+* Let you pin or float the xUnit version independently.
+* Keep framework + runner decisions in your test project for predictable upgrades.
+* Preserve the library’s focus: providing attributes/utilities instead of prescribing test infrastructure.
 
 If you want a different xUnit patch/minor version, change the `<PackageReference Include="xunit.v3" ... />` line—no changes to `Atc.Test` required.
 
@@ -66,9 +97,9 @@ If you want a different xUnit patch/minor version, change the `<PackageReference
 
 `Atc.Test` relies on xUnit v3 extensibility APIs:
 
-- Async data attribute signature: `ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(...)`.
-- `ITheoryDataRow` & metadata (Label, Explicit, Timeout) preservation.
-- `DisposalTracker` parameter passed to data attributes.
+* Async data attribute signature: `ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(...)`.
+* `ITheoryDataRow` & metadata (Label, Explicit, Timeout) preservation.
+* `DisposalTracker` parameter passed to data attributes.
 
 These do not exist in xUnit v2. Attempting to use a v2 framework or runner will result in discovery failures or compile errors.
 
@@ -195,9 +226,9 @@ public void Different_Interface_Not_Promoted(
 
 Design Rationale:
 
-- Class data is usually fully positional—implicit promotion might hide mistakes.
-- Member data often supplies only a prefix—promotion reduces duplication while staying explicit.
-- Exact-type restriction avoids cross-interface bleed (e.g., dual implementations hijacking unrelated abstractions).
+* Class data is usually fully positional—implicit promotion might hide mistakes.
+* Member data often supplies only a prefix—promotion reduces duplication while staying explicit.
+* Exact-type restriction avoids cross-interface bleed (e.g., dual implementations hijacking unrelated abstractions).
 
 ### Auto Registration of Customizations
 
