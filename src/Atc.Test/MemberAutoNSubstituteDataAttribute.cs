@@ -33,6 +33,19 @@ public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
     /// </summary>
     public object[] Parameters { get; }
 
+    /// <summary>
+    /// Produces the final theory data rows by merging member-supplied data with AutoFixture generated specimens.
+    /// </summary>
+    /// <param name="testMethod">The target test method whose parameters drive specimen generation.</param>
+    /// <param name="disposalTracker">xUnit disposal tracker (unused directly here but required by override).</param>
+    /// <returns>Augmented data rows containing original values plus generated specimens.</returns>
+    /// <remarks>
+    /// Processing for each source row:
+    /// 1. Create an isolated fixture.
+    /// 2. Apply frozen injection logic (positional + promotion) before resolving additional parameters.
+    /// 3. Generate remaining parameters using <see cref="GetSpecimen(IFixture, ParameterInfo)"/>.
+    /// 4. Preserve original row metadata (label, skip, etc.).
+    /// </remarks>
     public override async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
         MethodInfo testMethod,
         DisposalTracker disposalTracker)
@@ -73,6 +86,18 @@ public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
         return augmented;
     }
 
+    /// <summary>
+    /// Builds a delegate that performs two-phase frozen value handling for the supplied test method parameters.
+    /// </summary>
+    /// <param name="parameters">Ordered parameter list from the test method.</param>
+    /// <returns>An action taking (suppliedRowValues, fixture) which injects any frozen instances.</returns>
+    /// <remarks>
+    /// Phase 1 (Direct): For each parameter marked with <see cref="FrozenAttribute"/>, if the member row already
+    /// supplies a value at the same index, that instance is injected (frozen) into the fixture.
+    /// Phase 2 (Promotion): For frozen parameters whose index exceeds the supplied row length, the earliest
+    /// previously supplied compatible instance (assignable type) is promoted and injected. This enables scenarios
+    /// where the developer supplies a value earlier and later annotates a parameter of the same type with [Frozen].
+    /// </remarks>
     private static Action<object?[], IFixture> BuildFrozenInjector(ParameterInfo[] parameters)
     {
         // Identify parameters decorated with [Frozen]; capture index + type for later injection/promotion.
@@ -122,6 +147,16 @@ public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
         };
     }
 
+    /// <summary>
+    /// Resolves a specimen for a single parameter after applying any parameter-level customizations.
+    /// </summary>
+    /// <param name="fixture">The fixture instance configured for the current data row.</param>
+    /// <param name="parameter">The reflective description of the theory method parameter.</param>
+    /// <returns>The resolved object instance to be injected into the theory invocation.</returns>
+    /// <remarks>
+    /// Customizations are applied in a deterministic order with non-frozen customizations first, ensuring
+    /// that <see cref="FrozenAttribute"/> observes the final constructed form when freezing an instance.
+    /// </remarks>
     private static object GetSpecimen(
         IFixture fixture,
         ParameterInfo parameter)
