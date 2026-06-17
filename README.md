@@ -2,7 +2,7 @@
 
 ![NuGet Version](https://img.shields.io/nuget/v/Atc.Test.svg?logo=nuget&style=for-the-badge)
 
-`Atc.Test` is a .NET helper library that streamlines authoring tests with xUnit v3, AutoFixture, NSubstitute, and FluentAssertions. It provides rich data attributes, automatic specimen customization, and ergonomic frozen value reuse to reduce ceremony and improve test readability.
+`Atc.Test` is a .NET helper library that streamlines authoring tests with xUnit v3, AutoFixture, NSubstitute, and AwesomeAssertions. It provides rich data attributes, automatic specimen customization, and ergonomic frozen value reuse to reduce ceremony and improve test readability.
 
 ## Why Atc.Test
 
@@ -248,7 +248,7 @@ public class GuidCustomization : ICustomization
 
 | Helper | Purpose |
 |--------|---------|
-| `EquivalencyAssertionOptionsExtensions` | Adds convenience config (e.g., date precision) to FluentAssertions equivalency. |
+| `EquivalencyAssertionOptionsExtensions` | Adds convenience config (e.g., date precision) to AwesomeAssertions equivalency. |
 | `SubstituteExtensions` | Inspect substitutes, wait for calls, retrieve arguments. |
 | `TaskExtensions` | Await with timeouts. |
 | `ObjectExtensions` | Access protected members via reflection helpers. |
@@ -261,7 +261,19 @@ public class GuidCustomization : ICustomization
 | Target Frameworks | netstandard2.1, net8.0, net9.0 |
 | Test Framework | xUnit v3 (must be referenced directly) |
 | Mocking | NSubstitute (transitively used for interfaces/abstract classes) |
-| Assertions | FluentAssertions (recommended) |
+| Assertions | AwesomeAssertions (recommended) |
+
+## Migrating from FluentAssertions
+
+As of v3.0.0, `Atc.Test` depends on [AwesomeAssertions](https://github.com/AwesomeAssertions/AwesomeAssertions)
+(the Apache-2.0 community fork of FluentAssertions 7.x) instead of FluentAssertions, whose v8+
+releases require a paid commercial license. To upgrade a consuming project:
+
+1. Replace `using FluentAssertions;` with `using AwesomeAssertions;` (and likewise for the
+   `.Equivalency`, `.Primitives`, `.Execution`, and `.Extensions` sub-namespaces, plus any `<Using Include="FluentAssertions" />` global usings in your `.csproj`).
+2. Remove any direct `<PackageReference Include="FluentAssertions" ... />` from your test projects —
+   `Atc.Test` brings in `AwesomeAssertions` transitively.
+3. Your `.Should()...` assertions need no changes; the API is identical to FluentAssertions 7.x.
 
 ## How to Contribute
 
