@@ -1,4 +1,4 @@
-namespace Atc.Test.Tests.SampleTypes;
+namespace Atc.Test.Tests.TestSupport.Abstractions;
 
 public interface ISecondInterface
 {

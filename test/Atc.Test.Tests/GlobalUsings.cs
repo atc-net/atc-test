@@ -1,3 +1,10 @@
+global using System.Collections.Immutable;
 global using System.Text.Json;
-global using Atc.Test.Tests.SampleTypes;
+global using Atc.Test.Customizations;
+global using Atc.Test.Customizations.Generators;
+global using Atc.Test.Tests.TestSupport.Abstractions;
+global using Atc.Test.Tests.TestSupport.Customizations;
+global using Atc.Test.Tests.TestSupport.Models;
+global using AutoFixture.Kernel;
 global using AutoFixture.Xunit3;
+global using NSubstitute.Exceptions;
