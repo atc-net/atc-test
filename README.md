@@ -58,7 +58,7 @@
 * Exact-type frozen promotion for member data (reuse supplied instance across later `[Frozen]` parameters).
 * Deterministic fixture configuration with opt‑in auto-registration of custom `ICustomization` / `ISpecimenBuilder` via `[AutoRegister]`.
 * Convenience extensions: equivalency options, substitute inspection helpers, task timeout helpers, object protected member access.
-* Multi-targeted (netstandard2.1, net8.0, net9.0) for broad compatibility.
+* Multi-targeted (net8.0, net10.0) for broad compatibility.
 * Clear separation of concerns: you own the xUnit runner/version.
 
 ## Getting Started
@@ -70,13 +70,13 @@ Add `Atc.Test` to your test project along with explicit references to xUnit and 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="xunit.v3" Version="3.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="Atc.Test" Version="$(LatestOrPinned)" />
   </ItemGroup>
 </Project>
@@ -86,7 +86,7 @@ Add `Atc.Test` to your test project along with explicit references to xUnit and 
 
 `Atc.Test` depends on `xunit.v3.extensibility.core` (the extensibility surface) but intentionally does **not** bring in the `xunit.v3` meta-package:
 
-* Avoid NU1701 warnings from runner assets not targeting `netstandard2.1`.
+* Avoid forcing a specific xUnit runner/meta-package on your project.
 * Let you pin or float the xUnit version independently.
 * Keep framework + runner decisions in your test project for predictable upgrades.
 * Preserve the library’s focus: providing attributes/utilities instead of prescribing test infrastructure.
@@ -258,7 +258,7 @@ public class GuidCustomization : ICustomization
 
 | Aspect | Value |
 |--------|-------|
-| Target Frameworks | netstandard2.1, net8.0, net9.0 |
+| Target Frameworks | net8.0, net10.0 |
 | Test Framework | xUnit v3 (must be referenced directly) |
 | Mocking | NSubstitute (transitively used for interfaces/abstract classes) |
 | Assertions | AwesomeAssertions (recommended) |
