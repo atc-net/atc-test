@@ -1,4 +1,4 @@
-namespace Atc.Test.Tests.SampleTypes;
+namespace Atc.Test.Tests.TestSupport.Models;
 
 public class SecondInterfaceDependant
 {

@@ -1,4 +1,4 @@
-namespace Atc.Test.Tests.SampleTypes;
+namespace Atc.Test.Tests.TestSupport.Models;
 
 // Implements both interfaces so underlying instance satisfies each, allowing us to
 // detect overly-broad promotion logic that reuses an earlier IFirstInterface value

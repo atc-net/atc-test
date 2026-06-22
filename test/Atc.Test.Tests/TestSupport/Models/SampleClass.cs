@@ -1,5 +1,5 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-namespace Atc.Test.Tests.SampleTypes;
+namespace Atc.Test.Tests.TestSupport.Models;
 
 public class SampleClass
 {
