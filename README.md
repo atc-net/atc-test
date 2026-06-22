@@ -58,7 +58,6 @@
 * Exact-type frozen promotion for member data (reuse supplied instance across later `[Frozen]` parameters).
 * Deterministic fixture configuration with opt‑in auto-registration of custom `ICustomization` / `ISpecimenBuilder` via `[AutoRegister]`.
 * Convenience extensions: equivalency options, substitute inspection helpers, task timeout helpers, object protected member access.
-* Multi-targeted (net8.0, net10.0) for broad compatibility.
 * Clear separation of concerns: you own the xUnit runner/version.
 
 ## Getting Started
@@ -258,7 +257,6 @@ public class GuidCustomization : ICustomization
 
 | Aspect | Value |
 |--------|-------|
-| Target Frameworks | net8.0, net10.0 |
 | Test Framework | xUnit v3 (must be referenced directly) |
 | Mocking | NSubstitute (transitively used for interfaces/abstract classes) |
 | Assertions | AwesomeAssertions (recommended) |
