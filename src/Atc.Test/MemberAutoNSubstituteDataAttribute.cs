@@ -16,7 +16,9 @@ namespace Atc.Test;
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public sealed class MemberAutoNSubstituteDataAttribute : MemberDataAttributeBase
 {
-    public MemberAutoNSubstituteDataAttribute(string memberName, params object[] parameters)
+    public MemberAutoNSubstituteDataAttribute(
+        string memberName,
+        params object[] parameters)
         : base(memberName, parameters)
     {
         MemberName = memberName;

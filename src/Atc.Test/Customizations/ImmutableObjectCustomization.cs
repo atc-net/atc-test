@@ -1,6 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Collections.Immutable;
-
 namespace Atc.Test.Customizations;
 
 [AutoRegister]
@@ -51,20 +48,21 @@ public class ImmutableObjectCustomization : ICustomization
         Func<dynamic, object> converter)
         : ISpecimenBuilder
     {
-        public object Create(object request, ISpecimenContext context)
+        public object Create(
+            object request,
+            ISpecimenContext context)
         {
-            if (GetRequestType(request) is { } type
-                && type.IsGenericType
-                && type.GetGenericTypeDefinition() == immutableType
-                && type.GetGenericArguments() is { Length: > 0 } args)
+            if (GetRequestType(request) is not { IsGenericType: true } type
+                || type.GetGenericTypeDefinition() != immutableType
+                || type.GetGenericArguments() is not { Length: > 0 } args)
             {
-                var listType = underlyingType.MakeGenericType(args);
-                dynamic list = context.Resolve(listType);
-
-                return converter.Invoke(list);
+                return new NoSpecimen();
             }
 
-            return new NoSpecimen();
+            var listType = underlyingType.MakeGenericType(args);
+            dynamic list = context.Resolve(listType);
+
+            return converter.Invoke(list);
         }
 
         private static Type? GetRequestType(object request)
@@ -76,4 +74,3 @@ public class ImmutableObjectCustomization : ICustomization
             };
     }
 }
-#endif
