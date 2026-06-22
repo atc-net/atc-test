@@ -62,7 +62,10 @@ public static class EquivalencyAssertionOptionsExtensions
 
     private sealed class JsonElementEquivalencyStep : IEquivalencyStep
     {
-        public EquivalencyResult Handle(Comparands comparands, IEquivalencyValidationContext context, IValidateChildNodeEquivalency valueChildNodes)
+        public EquivalencyResult Handle(
+            Comparands comparands,
+            IEquivalencyValidationContext context,
+            IValidateChildNodeEquivalency valueChildNodes)
         {
             if (comparands.Subject is not JsonElement subject ||
                 comparands.Expectation is not JsonElement expectation)

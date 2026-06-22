@@ -14,7 +14,10 @@ public static class ObjectExtensions
     /// <param name="args">The method arguments.</param>
     /// <returns>The return value of the call.</returns>
     [return: MaybeNull]
-    public static object InvokeProtectedMethod(this object obj, string methodName, params object[] args)
+    public static object InvokeProtectedMethod(
+        this object obj,
+        string methodName,
+        params object[] args)
         => (obj ?? throw new ArgumentNullException(nameof(obj)))
             .GetType()
             .GetMethod(
@@ -34,7 +37,10 @@ public static class ObjectExtensions
     /// <param name="args">The method arguments.</param>
     /// <returns>The return value of the call.</returns>
     [return: MaybeNull]
-    public static T InvokeProtectedMethod<T>(this object obj, string methodName, params object[] args)
+    public static T InvokeProtectedMethod<T>(
+        this object obj,
+        string methodName,
+        params object[] args)
         => (T?)InvokeProtectedMethod(obj, methodName, args);
 
     /// <summary>

@@ -154,8 +154,7 @@ public static class StringExtensions
     /// </summary>
     /// <param name="str">The string.</param>
     /// <returns>The string with formatting removed.</returns>
-    public static string WithoutFormatting(
-        this string str)
+    public static string WithoutFormatting(this string str)
         => Regex.Replace(
             str.Trim(),
             "[\\s\\n]+",
@@ -168,8 +167,7 @@ public static class StringExtensions
     /// </summary>
     /// <param name="str">The string.</param>
     /// <returns>The string with xml formatting.</returns>
-    public static string WithXmlFormatting(
-        this string str)
+    public static string WithXmlFormatting(this string str)
     {
         var doc = new XmlDocument();
         doc.LoadXml(str);
@@ -190,8 +188,7 @@ public static class StringExtensions
     /// </summary>
     /// <param name="str">The string.</param>
     /// <returns>The string with json formatting.</returns>
-    public static string WithJsonFormatting(
-        this string str)
+    public static string WithJsonFormatting(this string str)
     {
         var doc = JsonDocument.Parse(str);
         var writeOptions = new JsonWriterOptions

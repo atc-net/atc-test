@@ -1,4 +1,5 @@
 global using System.Buffers;
+global using System.Collections.Immutable;
 global using System.Diagnostics;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Reflection;
@@ -16,6 +17,7 @@ global using AwesomeAssertions.Equivalency;
 global using AwesomeAssertions.Primitives;
 global using NSubstitute;
 global using NSubstitute.Core;
+global using NSubstitute.Exceptions;
 global using NSubstitute.ReceivedExtensions;
 global using Xunit;
 global using Xunit.Sdk;

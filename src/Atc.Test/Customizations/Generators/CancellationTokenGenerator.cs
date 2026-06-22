@@ -8,7 +8,9 @@ namespace Atc.Test.Customizations.Generators;
 public class CancellationTokenGenerator : ISpecimenBuilder
 {
     /// <inheritdoc/>
-    public object Create(object request, ISpecimenContext context)
+    public object Create(
+        object request,
+        ISpecimenContext context)
     {
         if (!request.IsRequestFor<CancellationToken>())
         {

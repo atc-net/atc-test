@@ -1,4 +1,3 @@
-#if NET6_0_OR_GREATER
 namespace Atc.Test.Customizations.Generators;
 
 /// <summary>
@@ -9,7 +8,9 @@ namespace Atc.Test.Customizations.Generators;
 public class DateOnlyGenerator : ISpecimenBuilder
 {
     /// <inheritdoc/>
-    public object Create(object request, ISpecimenContext context)
+    public object Create(
+        object request,
+        ISpecimenContext context)
     {
         if (!request.IsRequestFor<DateOnly>())
         {
@@ -19,4 +20,3 @@ public class DateOnlyGenerator : ISpecimenBuilder
         return DateOnly.FromDateTime(context.Create<DateTime>());
     }
 }
-#endif

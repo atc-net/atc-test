@@ -1,6 +1,4 @@
 // ReSharper disable AsyncVoidLambda
-using NSubstitute.Exceptions;
-
 namespace Atc.Test;
 
 /// <summary>
