@@ -23,6 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Compile settings">
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>14.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
