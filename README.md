@@ -1,55 +1,97 @@
-# Introduction
+# Atc.Test
 
 ![NuGet Version](https://img.shields.io/nuget/v/Atc.Test.svg?logo=nuget&style=for-the-badge)
 
 `Atc.Test` is a .NET helper library that streamlines authoring tests with xUnit v3, AutoFixture, NSubstitute, and AwesomeAssertions. It provides rich data attributes, automatic specimen customization, and ergonomic frozen value reuse to reduce ceremony and improve test readability.
 
-## Why Atc.Test
+## Atc.Test in 30 Seconds
 
-> You can “just wire everything manually” with plain xUnit and hand‑rolled mocks—so why use this instead?
+Every dependency your test does not care about is noise. `Atc.Test` lets you declare only the parameters the test is actually about — everything else is generated, substituted and wired for you.
 
-| Problem Without | What You Gain With `Atc.Test` | Why It Matters Over Time |
-|-----------------|-------------------------------|--------------------------|
-| Repeating constructor/mocker boilerplate in every test | Parameter-only intent: you list just what the test cares about | Lower cognitive load; faster review – noise removed |
-| Fragile refactors (add a ctor param ⇒ touch many files) | Fixture-driven auto‑supply of new dependencies | Constructor churn becomes O(1) instead of O(N tests) |
-| Divergent ad‑hoc mock styles (naming, setup order) | Central factory + consistent frozen reuse semantics | Suite stays uniform; easier large-scale edits / audits |
-| Accidental duplicate substitutes for logically single collaborator | `[Frozen]` exact-type reuse + early supplied promotion (member data) | Prevents subtle mismatch bugs & expectation gaps |
-| Manual re-creation of “shared conventions” (recursion handling, generators) | One-time customization via `[AutoRegister]` | New test inherits standards automatically |
-| AI-generated setup drifts over time | Declarative attributes act as a stable policy layer | Reduces maintenance & future prompt dependency |
+**Without `Atc.Test`**
 
-### When It Delivers the Most Value
+```csharp
+[Fact]
+public void Should_Return_Order_When_Found()
+{
+    // Arrange
+    var repository = Substitute.For<IOrderRepository>();
+    var pricing = Substitute.For<IPricingService>();
+    var audit = Substitute.For<IAuditLog>();
+    var clock = Substitute.For<TimeProvider>();
+    var sut = new OrderService(repository, pricing, audit, clock);
 
-* Mid/large test suites (hundreds+ of theory cases).
-* Domain services with evolving constructor graphs / dependencies.
-* Teams that value refactor safety and consistent test style.
-* Situations where only a few parameters per test truly matter.
+    var orderId = Guid.NewGuid();
+    var order = new Order { Id = orderId, Name = "Test order" };
+    repository.Get(orderId).Returns(order);
 
-### When Bare xUnit (+ manual mocks) May Be Enough
+    // Act
+    var result = sut.GetOrder(orderId);
 
-* Very small or short‑lived codebases.
-* Highly bespoke object graphs where you override almost every generated value anyway.
-* Educational contexts emphasizing explicit wiring for learning.
+    // Assert
+    result.Should().BeSameAs(order);
+}
+```
 
-### Summary
+**With `Atc.Test`**
 
-`Atc.Test` trades a tiny amount of initial abstraction for compounding savings in refactors, readability, and consistency. AI can quickly generate boilerplate; this library’s value is eliminating the need for that boilerplate in the first place—and giving you a single, policy‑driven locus for customization and reuse.
+```csharp
+[Theory]
+[AutoNSubstituteData]
+public void Should_Return_Order_When_Found(
+    [Frozen] IOrderRepository repository,
+    Guid orderId,
+    Order order,
+    OrderService sut)
+{
+    // Arrange
+    repository.Get(orderId).Returns(order);
+
+    // Act
+    var result = sut.GetOrder(orderId);
+
+    // Assert
+    result.Should().BeSameAs(order);
+}
+```
+
+`IPricingService`, `IAuditLog` and `TimeProvider` are still supplied to the constructor — they are simply no longer in your way. Add a fifth constructor parameter tomorrow and this test does not change.
 
 ## Table of Content
 
-* [Introduction](#introduction)
-    * [Why Atc.Test](#why-atctest)
-* [Table of Content](#table-of-content)
-    * [Features](#features)
-    * [Getting Started](#getting-started)
-        * [Install Package](#install-package)
-        * [Why xUnit Must Be Referenced Directly](#why-xunit-must-be-referenced-directly)
-        * [First Test Examples](#first-test-examples)
-    * [Advanced Usage](#advanced-usage)
-        * [Frozen Reuse Scenarios](#frozen-reuse-scenarios)
-        * [Auto Registration of Customizations](#auto-registration-of-customizations)
-        * [Helper Extensions](#helper-extensions)
-    * [Requirements](#requirements)
-    * [How to Contribute](#how-to-contribute)
+* [Atc.Test in 30 Seconds](#atctest-in-30-seconds)
+* [Cheat Sheet](#cheat-sheet)
+* [Features](#features)
+* [Getting Started](#getting-started)
+    * [Install Package](#install-package)
+    * [Version Compatibility](#version-compatibility)
+    * [Why xUnit Must Be Referenced Directly](#why-xunit-must-be-referenced-directly)
+    * [First Test Examples](#first-test-examples)
+* [Common Recipes](#common-recipes)
+* [Built-in Specimen Support](#built-in-specimen-support)
+* [Advanced Usage](#advanced-usage)
+    * [Frozen Reuse Scenarios](#frozen-reuse-scenarios)
+    * [Auto Registration of Customizations](#auto-registration-of-customizations)
+    * [Helper Extensions](#helper-extensions)
+* [Troubleshooting / FAQ](#troubleshooting--faq)
+* [Why Atc.Test](#why-atctest)
+* [Requirements](#requirements)
+* [Migrating from FluentAssertions](#migrating-from-fluentassertions)
+* [How to Contribute](#how-to-contribute)
+
+## Cheat Sheet
+
+Most users only ever need this table.
+
+| What you want | Use | Notes |
+|---------------|-----|-------|
+| Generate every parameter automatically | `[Theory] [AutoNSubstituteData]` | Interfaces/abstract types become NSubstitute substitutes. |
+| Mix fixed values with generated ones | `[Theory] [InlineAutoNSubstituteData(2, 3)]` | Inline values fill the leading parameters. |
+| Drive a theory from a member | `[Theory] [MemberAutoNSubstituteData(nameof(Source))]` | Supports **exact-type promotion** for `[Frozen]`. |
+| Drive a theory from a class | `[Theory] [ClassAutoNSubstituteData(typeof(Source))]` | Positional frozen injection only, no promotion. |
+| Reuse one instance across the graph | `[Frozen] IMyService service` | The same instance is injected into everything needing exactly `IMyService`. |
+| Teach the fixture about your own type | `[AutoRegister]` on an `ICustomization` / `ISpecimenBuilder` | Discovered automatically, no registration call needed. |
+| Build a fixture by hand | `FixtureFactory.Create()` | Same configuration the attributes use. |
 
 ## Features
 
@@ -57,6 +99,7 @@
 * Automatic interface/abstract substitution via NSubstitute.
 * Exact-type frozen promotion for member data (reuse supplied instance across later `[Frozen]` parameters).
 * Deterministic fixture configuration with opt‑in auto-registration of custom `ICustomization` / `ISpecimenBuilder` via `[AutoRegister]`.
+* Built-in specimen support for types AutoFixture handles poorly or not at all — `CancellationToken`, `DateOnly`, `TimeOnly`, `Uri`, `TimeProvider`, immutable collections and recursive graphs.
 * Convenience extensions: equivalency options, substitute inspection helpers, task timeout helpers, object protected member access.
 * Clear separation of concerns: you own the xUnit runner/version.
 
@@ -80,6 +123,14 @@ Add `Atc.Test` to your test project along with explicit references to xUnit and 
   </ItemGroup>
 </Project>
 ```
+
+### Version Compatibility
+
+| `Atc.Test` | xUnit | Target framework | Assertions |
+|------------|-------|------------------|------------|
+| 3.x | xUnit v3 (`xunit.v3` 4.x) | `net10.0` | AwesomeAssertions |
+
+For releases prior to 3.0.0, see the [CHANGELOG](CHANGELOG.md).
 
 ### Why xUnit Must Be Referenced Directly
 
@@ -153,6 +204,114 @@ All remaining parameters (after inline/member supplied ones) are created via an 
 
 > **Note**
 > NSubstitute is used automatically when the requested type is an interface or abstract class.
+
+## Common Recipes
+
+### Mock one dependency, auto-generate the rest
+
+Decorate the one you care about with `[Frozen]`. The same instance is injected into the system under test.
+
+```csharp
+[Theory]
+[AutoNSubstituteData]
+public void Should_Persist_Order(
+    [Frozen] IOrderRepository repository,
+    Order order,
+    OrderService sut)
+{
+    sut.Save(order);
+
+    repository.Received(1).Save(order);
+}
+```
+
+### Assert a substitute was called with a specific argument
+
+`ReceivedCallWithArgument<T>` returns the single argument of type `T` across all received calls, so you can assert on it directly instead of writing an `Arg.Is` predicate. It fails if there is not exactly one.
+
+```csharp
+sut.Save(order);
+
+var saved = repository.ReceivedCallWithArgument<Order>();
+
+saved.Status.Should().Be(OrderStatus.Pending);
+```
+
+Use `ReceivedCallsWithArguments<T>` when several arguments of that type are expected; it returns them all.
+
+### Wait for an asynchronous call
+
+For code that dispatches work in the background, `WaitForCall` waits until the call arrives or the timeout elapses.
+
+```csharp
+await handler.WaitForCall(x => x.Handle(Arg.Any<Message>()));
+```
+
+`WaitForCallForAnyArgs` is the argument-agnostic variant. Both throw on timeout.
+
+### Freeze the clock
+
+`TimeProvider` resolves to a provider reporting a fixed instant, so time-dependent code is deterministic and the test can assert against the same value.
+
+```csharp
+[Theory]
+[AutoNSubstituteData]
+public void Should_Stamp_Creation_Time(
+    [Frozen] TimeProvider timeProvider,
+    Order order,
+    OrderService sut)
+{
+    sut.Create(order);
+
+    order.CreatedUtc.Should().Be(timeProvider.GetUtcNow());
+}
+```
+
+### Control generation for your own type
+
+Any `ICustomization` or `ISpecimenBuilder` marked with `[AutoRegister]` is picked up automatically — no registration call anywhere.
+
+```csharp
+[AutoRegister]
+public class PositiveAmountCustomization : ICustomization
+{
+    public void Customize(IFixture fixture)
+        => fixture.Customize<Amount>(c => c.FromFactory(() => new Amount(100)));
+}
+```
+
+### Compare objects containing timestamps
+
+Round-tripped timestamps rarely match to the tick. `CompareDateTimeUsingCloseTo` relaxes the comparison.
+
+```csharp
+actual.Should().BeEquivalentTo(
+    expected,
+    o => o.CompareDateTimeUsingCloseTo());
+```
+
+### Compare strings ignoring formatting
+
+```csharp
+actualJson.Should().HaveSimilarJsonAs(expectedJson);
+actualXml.Should().HaveSimilarXmlAs(expectedXml);
+actualText.Should().HaveSimilarContentAs(expectedText);
+```
+
+## Built-in Specimen Support
+
+`FixtureFactory.Create()` — and therefore every data attribute — handles the following out of the box. Everything else falls back to standard AutoFixture behaviour.
+
+| Type | Behaviour |
+|------|-----------|
+| `CancellationToken` | A token that has **not** been canceled. |
+| `DateOnly` | Derived from a generated `DateTime`. |
+| `TimeOnly` | Derived from a generated `DateTime`. |
+| `Uri` | A readable absolute URI on the reserved `example.org` domain. |
+| `TimeProvider` | A provider reporting a fixed, generated UTC instant (`LocalTimeZone` is UTC). Combine with `[Frozen]` to share the instant. |
+| `ImmutableArray<T>`, `ImmutableList<T>`, `ImmutableHashSet<T>`, `ImmutableSortedSet<T>`, `ImmutableDictionary<TKey,TValue>`, `ImmutableSortedDictionary<TKey,TValue>` | Populated by generating a mutable counterpart and converting it. |
+| Interfaces / abstract classes | Substituted with NSubstitute. |
+| Recursive types | Recursion is omitted rather than throwing — the recursive member is left `null`. |
 
 ## Advanced Usage
 
@@ -243,6 +402,8 @@ public class GuidCustomization : ICustomization
 }
 ```
 
+The decorated type must expose a parameterless constructor. Discovery scans the assemblies loaded into the current `AppDomain`, so customizations declared in your test project are found without any configuration.
+
 ### Helper Extensions
 
 | Helper | Purpose |
@@ -251,7 +412,61 @@ public class GuidCustomization : ICustomization
 | `SubstituteExtensions` | Inspect substitutes, wait for calls, retrieve arguments. |
 | `TaskExtensions` | Await with timeouts. |
 | `ObjectExtensions` | Access protected members via reflection helpers. |
+| `StringExtensions` | Compare text, XML and JSON disregarding formatting. |
 | `FixtureFactory` | Central factory returning a consistently customized `IFixture`. |
+
+## Troubleshooting / FAQ
+
+**`NotSupportedException` when a fixture is created**
+A type marked `[AutoRegister]` implements neither `ICustomization` nor `ISpecimenBuilder`. Implement one of them, or remove the attribute.
+
+**My `[AutoRegister]` type is never applied**
+It must expose a parameterless constructor, and its assembly must be loaded. Types in your test project are loaded automatically; types in a separate assembly that nothing references may not be.
+
+**`[Frozen]` did not reuse the instance from my member data**
+Promotion matches the **exact** declared parameter type. A value supplied as `DualImpl` will not be promoted into a `[Frozen] IFoo` parameter. Declare the supplying parameter with the same type as the frozen one.
+
+**Class data does not promote frozen values, but member data does**
+This is intentional. Class data is normally fully positional, where implicit promotion would hide mistakes; member data commonly supplies only a leading subset. Use `MemberAutoNSubstituteData` when you want promotion.
+
+**A property on my generated object is unexpectedly `null`**
+The type is recursive. `Atc.Test` replaces AutoFixture's throwing recursion behaviour with `OmitOnRecursionBehavior`, so the recursive member is omitted instead of failing the test.
+
+**Build errors about missing xUnit types**
+`Atc.Test` does not bring in the `xunit.v3` meta-package by design. Add an explicit `<PackageReference Include="xunit.v3" ... />` to your test project.
+
+**My timestamps differ by a few ticks in `BeEquivalentTo`**
+Use `o => o.CompareDateTimeUsingCloseTo()`, or freeze `TimeProvider` so both sides derive from the same instant.
+
+## Why Atc.Test
+
+> You can “just wire everything manually” with plain xUnit and hand‑rolled mocks—so why use this instead?
+
+| Problem Without | What You Gain With `Atc.Test` | Why It Matters Over Time |
+|-----------------|-------------------------------|--------------------------|
+| Repeating constructor/mocker boilerplate in every test | Parameter-only intent: you list just what the test cares about | Lower cognitive load; faster review – noise removed |
+| Fragile refactors (add a ctor param ⇒ touch many files) | Fixture-driven auto‑supply of new dependencies | Constructor churn becomes O(1) instead of O(N tests) |
+| Divergent ad‑hoc mock styles (naming, setup order) | Central factory + consistent frozen reuse semantics | Suite stays uniform; easier large-scale edits / audits |
+| Accidental duplicate substitutes for logically single collaborator | `[Frozen]` exact-type reuse + early supplied promotion (member data) | Prevents subtle mismatch bugs & expectation gaps |
+| Manual re-creation of “shared conventions” (recursion handling, generators) | One-time customization via `[AutoRegister]` | New test inherits standards automatically |
+| AI-generated setup drifts over time | Declarative attributes act as a stable policy layer | Reduces maintenance & future prompt dependency |
+
+### When It Delivers the Most Value
+
+* Mid/large test suites (hundreds+ of theory cases).
+* Domain services with evolving constructor graphs / dependencies.
+* Teams that value refactor safety and consistent test style.
+* Situations where only a few parameters per test truly matter.
+
+### When Bare xUnit (+ manual mocks) May Be Enough
+
+* Very small or short‑lived codebases.
+* Highly bespoke object graphs where you override almost every generated value anyway.
+* Educational contexts emphasizing explicit wiring for learning.
+
+### Summary
+
+`Atc.Test` trades a tiny amount of initial abstraction for compounding savings in refactors, readability, and consistency. AI can quickly generate boilerplate; this library’s value is eliminating the need for that boilerplate in the first place—and giving you a single, policy‑driven locus for customization and reuse.
 
 ## Requirements
 
