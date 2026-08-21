@@ -1,22 +1,22 @@
 namespace Atc.Test.Customizations.Generators;
 
 /// <summary>
-/// Responsible for generating <see cref="DateOnly"/> instances
+/// Responsible for generating <see cref="TimeOnly"/> instances
 /// derived from a generated <see cref="DateTime"/>.
 /// </summary>
 [AutoRegister]
-public class DateOnlyGenerator : ISpecimenBuilder
+public class TimeOnlyGenerator : ISpecimenBuilder
 {
     /// <inheritdoc/>
     public object Create(
         object request,
         ISpecimenContext context)
     {
-        if (!request.IsRequestFor<DateOnly>())
+        if (!request.IsRequestFor<TimeOnly>())
         {
             return new NoSpecimen();
         }
 
-        return DateOnly.FromDateTime(context.Create<DateTime>());
+        return TimeOnly.FromDateTime(context.Create<DateTime>());
     }
 }
