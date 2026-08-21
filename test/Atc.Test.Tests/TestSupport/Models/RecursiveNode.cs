@@ -3,5 +3,5 @@ namespace Atc.Test.Tests.TestSupport.Models;
 
 public class RecursiveNode
 {
-    public RecursiveNode Child { get; set; } = null!;
+    public RecursiveNode Child { get; set; }
 }

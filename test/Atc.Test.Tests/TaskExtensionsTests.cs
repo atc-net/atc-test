@@ -76,7 +76,7 @@ public sealed class TaskExtensionsTests
     public Task AddTimeout_Should_Throw_For_Null_Task()
     {
         // Arrange
-        Task task = null!;
+        Task task = null;
 
         // Act
         var act = () => task.AddTimeout();
