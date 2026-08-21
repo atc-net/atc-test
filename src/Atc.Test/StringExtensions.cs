@@ -125,7 +125,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Asserts that a string dos not have similar json content disregarding formatting.
+    /// Asserts that a string does not have similar json content disregarding formatting.
     /// </summary>
     /// <param name="assertions">The StringAssertions.</param>
     /// <param name="expected">
