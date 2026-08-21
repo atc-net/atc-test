@@ -28,7 +28,7 @@
     <LangVersion>14.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1573,1591,1712</NoWarn>
+    <NoWarn>1573,1591,1712,NU1608</NoWarn>
 
     <!-- Used by code coverage -->
     <DebugType>full</DebugType>
@@ -50,9 +50,9 @@
     <PackageReference Include="Atc.Analyzer" Version="0.1.23" PrivateAssets="All" />
     <PackageReference Include="AsyncFixer" Version="2.1.0" PrivateAssets="All" />
     <PackageReference Include="AwesomeAssertions.Analyzers" Version="9.0.8" PrivateAssets="All" />
-    <PackageReference Include="Meziantou.Analyzer" Version="3.0.104" PrivateAssets="All" />
+    <PackageReference Include="Meziantou.Analyzer" Version="3.0.177" PrivateAssets="All" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.27.0.140913" PrivateAssets="All" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.32.0.713" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

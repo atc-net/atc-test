@@ -75,7 +75,7 @@ Add `Atc.Test` to your test project along with explicit references to xUnit and 
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
-    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
     <PackageReference Include="Atc.Test" Version="$(LatestOrPinned)" />
   </ItemGroup>
 </Project>
