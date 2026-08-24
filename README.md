@@ -69,6 +69,7 @@ public void Should_Return_Order_When_Found(
     * [First Test Examples](#first-test-examples)
 * [Common Recipes](#common-recipes)
 * [Built-in Specimen Support](#built-in-specimen-support)
+* [Working With Atc.Test (deep dive)](docs/working-with.md)
 * [Advanced Usage](#advanced-usage)
     * [Frozen Reuse Scenarios](#frozen-reuse-scenarios)
     * [Auto Registration of Customizations](#auto-registration-of-customizations)
@@ -92,6 +93,7 @@ Most users only ever need this table.
 | Reuse one instance across the graph | `[Frozen] IMyService service` | The same instance is injected into everything needing exactly `IMyService`. |
 | Teach the fixture about your own type | `[AutoRegister]` on an `ICustomization` / `ISpecimenBuilder` | Discovered automatically, no registration call needed. |
 | Build a fixture by hand | `FixtureFactory.Create()` | Same configuration the attributes use. |
+| Fail a hanging async test fast | `await task.AddTimeout()` | Defaults to 5s, and is **bypassed when a debugger is attached**. |
 
 ## Features
 
@@ -247,7 +249,25 @@ For code that dispatches work in the background, `WaitForCall` waits until the c
 await handler.WaitForCall(x => x.Handle(Arg.Any<Message>()));
 ```
 
-`WaitForCallForAnyArgs` is the argument-agnostic variant. Both throw on timeout.
+`WaitForCallForAnyArgs` is the argument-agnostic variant. Both default to a 5 second timeout, accept an explicit `TimeSpan`, and throw on timeout.
+
+### Stop a hanging test from blocking the suite
+
+`AddTimeout` fails a task that never completes, instead of letting the run hang until the framework kills it.
+
+```csharp
+var result = await sut.ProcessAsync().AddTimeout();
+
+await sut.StartAsync().AddTimeout(TimeSpan.FromSeconds(30));
+```
+
+The default is 5 seconds. When a debugger is attached the timeout is **ignored**, so stepping through a test does not trip a `TimeoutException`.
+
+To await several tasks and collect their results, `AwaitTasks` reads more naturally than `Task.WhenAll`:
+
+```csharp
+var results = await new[] { first, second, third }.AwaitTasks();
+```
 
 ### Freeze the clock
 
@@ -288,6 +308,13 @@ Round-tripped timestamps rarely match to the tick. `CompareDateTimeUsingCloseTo`
 actual.Should().BeEquivalentTo(
     expected,
     o => o.CompareDateTimeUsingCloseTo());
+```
+
+The default precision is 1000 ms. Pass an `int` for a different millisecond precision, or a `TimeSpan` when that reads better:
+
+```csharp
+o => o.CompareDateTimeUsingCloseTo(precision: 500)
+o => o.CompareDateTimeUsingCloseTo(TimeSpan.FromSeconds(2))
 ```
 
 ### Compare strings ignoring formatting
