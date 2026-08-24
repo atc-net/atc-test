@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.0](https://github.com/atc-net/atc-test/compare/v3.0.0...v3.1.0) (2026-08-24)
+
+
+### Features
+
+* Add TimeOnly, Uri and TimeProvider specimen generators ([3882e07](https://github.com/atc-net/atc-test/commit/3882e073de0c16ebd6f277227fe80eb9f10096a3))
+* **deps:** Upgrade xunit packages to v4.0.0 ([47c25af](https://github.com/atc-net/atc-test/commit/47c25af0108ea8e590804198a5899ef877cc352d))
+
 ## [3.0.0](https://github.com/atc-net/atc-test/compare/v2.0.17...v3.0.0) (2026-06-22)
 
 
