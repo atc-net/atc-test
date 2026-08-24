@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/atc-net/atc-test/compare/v3.1.0...v3.1.1) (2026-08-24)
+
+
+### Bug Fixes
+
+* **deps:** downgrade NSubstitute to 5.3 again - wating on AutoFixture v5.0 to be released to avoid NU1608 issues ([9d35c3a](https://github.com/atc-net/atc-test/commit/9d35c3ab4395b08856c7fd103324056884d9d429))
+
 ## [3.1.0](https://github.com/atc-net/atc-test/compare/v3.0.0...v3.1.0) (2026-08-24)
 
 
