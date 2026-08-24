@@ -52,7 +52,7 @@
     <PackageReference Include="AwesomeAssertions.Analyzers" Version="9.0.8" PrivateAssets="All" />
     <PackageReference Include="Meziantou.Analyzer" Version="3.0.177" PrivateAssets="All" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.32.0.713" PrivateAssets="All" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.33.0.1635" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
